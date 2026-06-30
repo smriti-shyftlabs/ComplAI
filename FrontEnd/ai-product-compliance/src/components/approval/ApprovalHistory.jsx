@@ -1,11 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiFilter } from 'react-icons/fi';
-import { auditLogs } from '../../data/dashboardData';
+import { getAuditLog } from '../../services/approvalService';
 import { formatDateTime } from '../../utils/helpers';
 
 export default function ApprovalHistory() {
   const [filter, setFilter] = useState('all');
+  const [auditLogs, setAuditLogs] = useState([]);
+
+  useEffect(() => {
+    getAuditLog().then(setAuditLogs).catch(() => setAuditLogs([]));
+  }, []);
 
   const decisions = ['Approved', 'Rejected', 'Requested Changes'];
   const filtered = filter === 'all' ? auditLogs.filter(l => decisions.includes(l.action)) : auditLogs.filter(l => l.action === filter);

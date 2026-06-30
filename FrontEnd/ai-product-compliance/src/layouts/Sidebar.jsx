@@ -57,7 +57,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <FiShield className="text-white w-5 h-5" />
           </div>
           <div>
-            <span className="text-base font-bold text-gray-900 leading-tight block">ComplianceAI</span>
+            <span className="text-base font-bold text-gray-900 leading-tight block">ComplAI</span>
             <span className="text-xs text-gray-500">Catalog Governance</span>
           </div>
         </div>

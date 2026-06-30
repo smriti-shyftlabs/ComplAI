@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiShield, FiBell, FiUsers, FiLink, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
-import { users } from '../../data/dashboardData';
-import { complianceRules } from '../../data/complianceRules';
+import { getUsers } from '../../services/userService';
+import { getRules } from '../../services/metaService';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import { SeverityBadge } from '../../components/common/Badge';
@@ -21,6 +21,14 @@ function Toggle({ enabled, onChange }) {
 
 export default function Settings() {
   const [tab, setTab] = useState('general');
+  const [users, setUsers] = useState([]);
+  const [complianceRules, setComplianceRules] = useState([]);
+
+  useEffect(() => {
+    getUsers().then(setUsers).catch(() => setUsers([]));
+    getRules().then(setComplianceRules).catch(() => setComplianceRules([]));
+  }, []);
+
   const [notifications, setNotifications] = useState({
     email: true, slack: false, sla: true, newProduct: true, approved: true, rejected: true, certificate: true
   });

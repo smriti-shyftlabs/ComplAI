@@ -1,125 +1,34 @@
 /**
- * productService.js — backed by InMemoryDB `products` collection.
+ * productService.js — backed by the ComplAI REST API.
  */
 
-import { Products, AuditLogs } from '../db/initDB';
-import { delay, generateId } from '../utils/helpers';
+import { api } from './api';
 
 // ─── Read ─────────────────────────────────────────────────────────────────────
+export const getProducts = () => api.get('/products');
 
-export const getProducts = async () => {
-  await delay(250);
-  return Products().sort('createdAt', 'desc');
-};
+export const getProductById = (id) => api.get(`/products/${id}`);
 
-export const getProductById = async (id) => {
-  await delay(150);
-  const product = Products().findById(id);
-  if (!product) throw new Error(`Product ${id} not found`);
-  return product;
-};
+export const getProductsByStatus = (status) => api.get(`/products/by-status/${encodeURIComponent(status)}`);
 
-export const getProductsByStatus = async (status) => {
-  await delay(200);
-  return Products().findByIndex('status', status);
-};
+export const getProductsByCategory = (category) => api.get(`/products/by-category/${encodeURIComponent(category)}`);
 
-export const getProductsByCategory = async (category) => {
-  await delay(200);
-  return Products().findByIndex('category', category);
-};
+export const getProductsPaginated = (page = 1, perPage = 10, filter = null) =>
+  api.get('/products/paginated', { page, perPage, status: filter?.status });
 
-export const getProductsPaginated = async (page = 1, perPage = 10, filter = null) => {
-  await delay(200);
-  return Products().paginate(page, perPage, filter);
-};
+export const getStatusCounts = () => api.get('/products/counts/status');
 
-export const getStatusCounts = async () => {
-  await delay(100);
-  return Products().groupCount('status');
-};
+export const getCategoryCounts = () => api.get('/products/counts/category');
 
-export const getCategoryCounts = async () => {
-  await delay(100);
-  return Products().groupCount('category');
-};
+export const getAverageComplianceScore = async () => (await api.get('/products/avg-score')).average;
 
-export const getAverageComplianceScore = async () => {
-  await delay(100);
-  return Products().avg('complianceScore');
-};
-
-export const searchProducts = async (query) => {
-  await delay(200);
-  const q = query.toLowerCase();
-  return Products().find(
-    r =>
-      r.name?.toLowerCase().includes(q) ||
-      r.brand?.toLowerCase().includes(q) ||
-      r.category?.toLowerCase().includes(q) ||
-      r.description?.toLowerCase().includes(q)
-  );
-};
+export const searchProducts = (query) => api.get('/products/search', { q: query });
 
 // ─── Write ────────────────────────────────────────────────────────────────────
+export const createProduct = (data) => api.post('/products', data);
 
-export const createProduct = async (data) => {
-  await delay(400);
-  const newProduct = {
-    ...data,
-    id: generateId('PRD'),
-    status: 'pending',
-    complianceScore: 0,
-    riskLevel: 'medium',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    images: data.images || [],
-    certificates: data.certificates || [],
-    aiScore: 0,
-    reviewedBy: null,
-    tags: data.tags || [],
-  };
-  const inserted = Products().insert(newProduct);
-  _auditLog(inserted.id, 'Created', 'Admin User', 'Product submitted for compliance review');
-  return inserted;
-};
+export const updateProduct = (id, patch) => api.patch(`/products/${id}`, patch);
 
-export const updateProduct = async (id, patch) => {
-  await delay(300);
-  const updated = Products().update(id, patch);
-  if (!updated) throw new Error(`Product ${id} not found`);
-  return updated;
-};
+export const deleteProduct = (id) => api.del(`/products/${id}`);
 
-export const deleteProduct = async (id) => {
-  await delay(300);
-  const deleted = Products().delete(id);
-  if (!deleted) throw new Error(`Product ${id} not found`);
-  _auditLog(id, 'Deleted', 'Admin User', `Product "${deleted.name}" removed`);
-  return deleted;
-};
-
-export const publishProduct = async (id) => {
-  await delay(400);
-  const updated = Products().update(id, {
-    status: 'published',
-    publishedAt: new Date().toISOString(),
-  });
-  if (!updated) throw new Error(`Product ${id} not found`);
-  _auditLog(id, 'Published', 'Admin User', 'Product published to marketplace');
-  return updated;
-};
-
-// ─── Internal ─────────────────────────────────────────────────────────────────
-
-function _auditLog(productId, action, user, comment) {
-  AuditLogs().insert({
-    id: generateId('LOG'),
-    productId,
-    action,
-    user,
-    avatar: user.split(' ').map(w => w[0]).join('').toUpperCase(),
-    comment,
-    timestamp: new Date().toISOString(),
-  });
-}
+export const publishProduct = (id) => api.post(`/products/${id}/publish`);

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiPackage, FiShield, FiClock, FiXCircle, FiAlertTriangle, FiAlertCircle, FiInfo, FiCheckCircle, FiArrowRight } from 'react-icons/fi';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -7,8 +7,9 @@ import DashboardCard from '../../components/dashboard/DashboardCard';
 import ComplianceChart from '../../components/dashboard/ComplianceChart';
 import RecentProducts from '../../components/dashboard/RecentProducts';
 import QuickActions from '../../components/dashboard/QuickActions';
-import { kpiData, categoryDistribution, recentAlerts } from '../../data/dashboardData';
+import { kpiData } from '../../data/dashboardData';
 import { useProducts } from '../../hooks/useProducts';
+import { getAnalytics } from '../../services/metaService';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
 
@@ -25,6 +26,15 @@ const alertTypeStyles = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { products } = useProducts();
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    getAnalytics().then(setAnalytics).catch(() => setAnalytics(null));
+  }, []);
+
+  const categories = analytics?.categoryBreakdown || [];
+  const alerts = analytics?.recentAlerts || [];
+  const trend = analytics?.complianceTrend || [];
 
   // Derive KPI values from the live product catalog, keeping the
   // trend/change/icon/color styling defined in kpiData.
@@ -91,7 +101,7 @@ export default function Dashboard() {
             </button>
           }
         >
-          <ComplianceChart />
+          <ComplianceChart data={trend} />
         </DashboardCard>
 
         <DashboardCard title="Category Distribution" subtitle="Products by category">
@@ -99,7 +109,7 @@ export default function Dashboard() {
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={categoryDistribution.slice(0, 6)}
+                  data={categories.slice(0, 6)}
                   cx="50%"
                   cy="45%"
                   innerRadius={55}
@@ -107,7 +117,7 @@ export default function Dashboard() {
                   paddingAngle={3}
                   dataKey="value"
                 >
-                  {categoryDistribution.slice(0, 6).map((entry, i) => (
+                  {categories.slice(0, 6).map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}
                 </Pie>
@@ -155,7 +165,7 @@ export default function Dashboard() {
         }
       >
         <div className="space-y-2">
-          {recentAlerts.map((alert, i) => (
+          {alerts.map((alert, i) => (
             <motion.div
               key={alert.id}
               initial={{ opacity: 0, x: -10 }}

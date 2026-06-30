@@ -8,7 +8,7 @@ import AISuggestions from '../../components/compliance/AISuggestions';
 import RuleViolationCard from '../../components/compliance/RuleViolationCard';
 import { StatusBadge, RiskBadge } from '../../components/common/Badge';
 import Button from '../../components/common/Button';
-import { dummyProducts } from '../../data/dummyProducts';
+import { getProducts } from '../../services/productService';
 import { analyzeProduct } from '../../services/aiService';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 
@@ -27,7 +27,9 @@ export default function ComplianceReport() {
         setLoading(false);
         return;
       }
-      const p = dummyProducts[1];
+      const all = await getProducts();
+      const p = all.find(x => x.status === 'pending') || all[0];
+      if (!p) { setLoading(false); return; }
       setProduct(p);
       const result = await analyzeProduct(p);
       setReport(result);

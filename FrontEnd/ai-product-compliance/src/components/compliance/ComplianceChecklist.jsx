@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCheck, FiX, FiAlertTriangle, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { SeverityBadge } from '../common/Badge';
-import { complianceRules } from '../../data/complianceRules';
+import { getRules } from '../../services/metaService';
 
 export default function ComplianceChecklist({ violations = [] }) {
   const [expanded, setExpanded] = useState(null);
+  const [allRules, setAllRules] = useState([]);
 
-  const violationRuleIds = violations.map(v => v.rule);
+  useEffect(() => {
+    getRules().then(setAllRules).catch(() => setAllRules([]));
+  }, []);
 
   const getRuleStatus = (rule) => {
     const violation = violations.find(v => v.rule === rule.name);
@@ -15,7 +18,7 @@ export default function ComplianceChecklist({ violations = [] }) {
     return { status: 'pass', violation: null };
   };
 
-  const rules = complianceRules.slice(0, 12);
+  const rules = allRules.slice(0, 12);
 
   const statusIcon = (status) => {
     if (status === 'pass') return <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center"><FiCheck className="w-3 h-3 text-green-600" /></div>;
