@@ -168,7 +168,7 @@ export function initDB() {
   db._analytics = ANALYTICS_SEED;
 
   if (import.meta.env.DEV) {
-    console.group('[ComplianceAI DB] Initialized');
+    console.group('[ComplAI DB] Initialized');
     console.table(db.stats());
     console.groupEnd();
   }

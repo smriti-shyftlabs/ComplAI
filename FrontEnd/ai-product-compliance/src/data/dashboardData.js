@@ -170,4 +170,5 @@ export const users = [
   { id: 'USR-004', name: 'Emily Rodriguez',  email: 'emily.rodriguez@company.com', role: 'Senior Reviewer',    department: 'Compliance',  avatar: 'ER', passwordHash: _h('emily123'),   productsReviewed: 419, approvalRate: '93%', status: 'active', createdAt: '2024-01-01T00:00:00Z' },
   { id: 'USR-005', name: 'David Kim',        email: 'david.kim@company.com',       role: 'Compliance Analyst', department: 'Compliance',  avatar: 'DK', passwordHash: _h('david123'),   productsReviewed: 198, approvalRate: '87%', status: 'active', createdAt: '2024-01-01T00:00:00Z' },
   { id: 'USR-006', name: 'James Wilson',     email: 'james.wilson@company.com',    role: 'Junior Reviewer',    department: 'Compliance',  avatar: 'JW', passwordHash: _h('james123'),   productsReviewed: 54,  approvalRate: '79%', status: 'active', createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'USR-007', name: 'Sneha',            email: 'sneha@shyftlabs.io',          role: 'Admin',              department: 'Platform',    avatar: 'SN', passwordHash: _h('admin@123'),  productsReviewed: 0,   approvalRate: '0%',  status: 'active', createdAt: '2024-01-01T00:00:00Z' },
 ];

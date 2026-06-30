@@ -8,7 +8,7 @@ const initialMessages = [
   {
     id: 1,
     type: 'ai',
-    text: "Hi! I'm ComplianceAI. I can explain regulations **and** answer questions about your live catalog — try asking why a product was rejected or how many are pending review.",
+    text: "Hi! I'm ComplAI. I can explain regulations **and** answer questions about your live catalog — try asking why a product was rejected or how many are pending review.",
     time: 'Just now'
   }
 ];
@@ -98,7 +98,7 @@ export default function AIChat() {
                 <FiZap className="w-4 h-4 text-white" />
               </div>
               <div>
-                <p className="text-sm font-600 text-white">ComplianceAI Assistant</p>
+                <p className="text-sm font-600 text-white">ComplAI Assistant</p>
                 <p className="text-xs text-blue-100">Ask me anything about compliance</p>
               </div>
               <div className="ml-auto flex items-center gap-1">

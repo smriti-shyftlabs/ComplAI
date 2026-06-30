@@ -10,8 +10,16 @@
 # Logs
 *.log
 
-# Build folders
-frontend/dist/
-frontend/build/
-backend/dist/
-backend/build/
+# Build output
+**/dist/
+**/build/
+
+# Vite cache
+**/.vite/
+.vite/
+
+# SQLite database (created at runtime)
+**/*.db
+**/*.db-wal
+**/*.db-shm
+**/*.db-journal

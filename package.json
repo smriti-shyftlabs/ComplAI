@@ -1,0 +1,9 @@
+{
+  "name": "complai",
+  "private": true,
+  "description": "ComplAI — AI product-compliance dashboard (backend + frontend)",
+  "scripts": {
+    "dev": "bash start.sh",
+    "setup": "cd BackEnd && npm install && cd ../FrontEnd/ai-product-compliance && npm install"
+  }
+}

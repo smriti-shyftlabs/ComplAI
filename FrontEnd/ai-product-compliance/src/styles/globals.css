@@ -23,10 +23,13 @@
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
+/* NOTE: do NOT add a global universal margin/padding reset here.
+   This file is unlayered and loads after Tailwind, and unlayered rules
+   override Tailwind's layered utilities, so a global margin/padding reset
+   silently kills every padding and margin utility app-wide. Tailwind's
+   own preflight (via index.css) already handles resets. */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 html {

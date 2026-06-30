@@ -1,15 +1,18 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { FiSearch, FiDownload, FiFilter } from 'react-icons/fi';
+import { useState, useEffect } from 'react';
+import { FiSearch, FiDownload } from 'react-icons/fi';
 import AuditTimeline from '../../components/approval/AuditTimeline';
 import Button from '../../components/common/Button';
-import { auditLogs } from '../../data/dashboardData';
-import { formatDate } from '../../utils/helpers';
+import { getAuditLog } from '../../services/approvalService';
 
 export default function AuditTrail() {
+  const [auditLogs, setAuditLogs] = useState([]);
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [userFilter, setUserFilter] = useState('all');
+
+  useEffect(() => {
+    getAuditLog().then(setAuditLogs).catch(() => setAuditLogs([]));
+  }, []);
 
   const actions = ['all', 'Approved', 'Rejected', 'Published', 'Analyzed', 'Flagged', 'Requested Changes'];
   const users = ['all', ...new Set(auditLogs.map(l => l.user))];

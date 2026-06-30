@@ -1,7 +1,6 @@
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
-import { complianceTrendData } from '../../data/dashboardData';
 
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
@@ -21,11 +20,11 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function ComplianceChart() {
+export default function ComplianceChart({ data = [] }) {
   return (
     <div className="h-64 sm:h-72">
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={complianceTrendData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+        <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
           <defs>
             <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15} />

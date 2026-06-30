@@ -109,6 +109,11 @@ export default function ApprovalCard({ product, onApprove, onReject, onRequestCh
             >
               <FiMessageSquare className="w-3.5 h-3.5" />
               {showComment ? 'Hide' : 'Add'} comment
+              {comment.trim() && (
+                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-blue-100 text-blue-600 text-[10px] font-700">
+                  1
+                </span>
+              )}
             </button>
           </div>
         </div>

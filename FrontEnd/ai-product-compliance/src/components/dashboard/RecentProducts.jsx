@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { StatusBadge } from '../common/Badge';
 import { formatDate } from '../../utils/helpers';
-import { dummyProducts } from '../../data/dummyProducts';
+import { useProducts } from '../../hooks/useProducts';
 
 function ScoreBar({ score }) {
   const color = score >= 90 ? 'bg-green-500' : score >= 75 ? 'bg-blue-500' : score >= 50 ? 'bg-yellow-500' : 'bg-red-500';
@@ -23,7 +23,8 @@ function ScoreBar({ score }) {
 
 export default function RecentProducts() {
   const navigate = useNavigate();
-  const recent = dummyProducts.slice(0, 6);
+  const { products } = useProducts();
+  const recent = products.slice(0, 6);
 
   return (
     <div className="overflow-x-auto -mx-1">

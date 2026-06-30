@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiMenu, FiBell, FiSearch, FiSun, FiMoon, FiChevronDown,
-  FiUser, FiSettings, FiLogOut, FiHelpCircle
+  FiUser, FiSettings, FiLogOut
 } from 'react-icons/fi';
-import { notifications } from '../data/dashboardData';
+import { getNotifications, markAllNotificationsRead } from '../services/metaService';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ onMenuClick }) {
@@ -15,8 +15,18 @@ export default function Navbar({ onMenuClick }) {
   const [showProfile, setShowProfile] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDark, setIsDark] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    getNotifications().then(setNotifications).catch(() => setNotifications([]));
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  const markAllRead = async () => {
+    try { await markAllNotificationsRead(); } catch { /* ignore */ }
+    setNotifications(ns => ns.map(n => ({ ...n, read: true })));
+  };
 
   const getGreeting = () => {
     const h = new Date().getHours();
@@ -48,7 +58,7 @@ export default function Navbar({ onMenuClick }) {
       {/* Greeting */}
       <div className="hidden sm:block">
         <p className="text-sm font-semibold text-gray-900">{getGreeting()}, {currentUser?.name?.split(' ')[0] || 'User'}</p>
-        <p className="text-xs text-gray-500">Welcome back to ComplianceAI</p>
+        <p className="text-xs text-gray-500">Welcome back to ComplAI</p>
       </div>
 
       {/* Search */}
@@ -99,7 +109,7 @@ export default function Navbar({ onMenuClick }) {
               >
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                   <span className="text-sm font-semibold text-gray-900">Notifications</span>
-                  <span className="text-xs text-blue-600 cursor-pointer hover:underline">Mark all read</span>
+                  <button onClick={markAllRead} className="text-xs text-blue-600 cursor-pointer hover:underline">Mark all read</button>
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.map(n => (

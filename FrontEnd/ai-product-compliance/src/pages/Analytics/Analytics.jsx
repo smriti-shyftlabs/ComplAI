@@ -1,12 +1,13 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend
 } from 'recharts';
-import { complianceTrendData, categoryDistribution } from '../../data/dashboardData';
-import { dummyProducts } from '../../data/dummyProducts';
+import { getAnalytics } from '../../services/metaService';
 
+// Illustrative time-series (no per-month history is stored server-side).
 const approvalRate = [
   { month: 'Jul', rate: 78, rejected: 22 },
   { month: 'Aug', rate: 82, rejected: 18 },
@@ -25,15 +26,6 @@ const aiAccuracy = [
   { month: 'Dec', accuracy: 97 }
 ];
 
-const categoryByCompliance = categoryDistribution.map(c => ({
-  name: c.name.length > 10 ? c.name.substring(0, 10) + '...' : c.name,
-  fullName: c.name,
-  avg: Math.floor(Math.random() * 25) + 72,
-  products: c.value
-}));
-
-const pieColors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-
 function ChartCard({ title, subtitle, children }) {
   return (
     <motion.div
@@ -51,18 +43,26 @@ function ChartCard({ title, subtitle, children }) {
 }
 
 export default function Analytics() {
-  const statusCounts = {
-    published: dummyProducts.filter(p => p.status === 'published').length,
-    approved: dummyProducts.filter(p => p.status === 'approved').length,
-    pending: dummyProducts.filter(p => p.status === 'pending').length,
-    rejected: dummyProducts.filter(p => p.status === 'rejected').length
-  };
+  const [data, setData] = useState(null);
 
-  const statusData = [
-    { name: 'Published', value: statusCounts.published, color: '#10B981' },
-    { name: 'Approved', value: statusCounts.approved, color: '#3B82F6' },
-    { name: 'Pending', value: statusCounts.pending, color: '#F59E0B' },
-    { name: 'Rejected', value: statusCounts.rejected, color: '#EF4444' }
+  useEffect(() => {
+    getAnalytics().then(setData).catch(() => setData(null));
+  }, []);
+
+  const trend = data?.complianceTrend || [];
+  const statusData = data?.statusDistribution || [];
+  const categoryByCompliance = (data?.categoryBreakdown || []).map(c => ({
+    name: c.name.length > 10 ? c.name.substring(0, 10) + '…' : c.name,
+    fullName: c.name,
+    avg: c.avg,
+    products: c.value,
+  }));
+
+  const kpis = [
+    { label: 'Avg Compliance Score', value: data ? `${data.kpi.avgComplianceScore}%` : '—', color: 'bg-blue-600' },
+    { label: 'AI Accuracy', value: '96.8%', color: 'bg-green-600' },
+    { label: 'Approval Rate', value: data ? `${data.kpi.approvalRate}%` : '—', color: 'bg-purple-600' },
+    { label: 'Reports Generated', value: data ? data.kpi.reportsGenerated : '—', color: 'bg-orange-500' },
   ];
 
   return (
@@ -75,12 +75,7 @@ export default function Analytics() {
 
       {/* Top KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[
-          { label: 'Avg Compliance Score', value: '87.3%', color: 'bg-blue-600' },
-          { label: 'AI Accuracy', value: '96.8%', color: 'bg-green-600' },
-          { label: 'Approval Rate', value: '87%', color: 'bg-purple-600' },
-          { label: 'Avg Review Time', value: '18.4h', color: 'bg-orange-500' }
-        ].map(kpi => (
+        {kpis.map(kpi => (
           <div key={kpi.label} className={`${kpi.color} text-white rounded-xl p-4`}>
             <p className="text-2xl font-700">{kpi.value}</p>
             <p className="text-xs opacity-80 mt-0.5">{kpi.label}</p>
@@ -96,7 +91,7 @@ export default function Analytics() {
               <BarChart data={categoryByCompliance} margin={{ top: 5, right: 10, left: -10, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#94A3B8' }} angle={-30} textAnchor="end" axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} domain={[60, 100]} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} domain={[0, 100]} axisLine={false} tickLine={false} />
                 <Tooltip formatter={(v) => [`${v}%`, 'Avg Score']} />
                 <Bar dataKey="avg" fill="#3B82F6" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -164,7 +159,7 @@ export default function Analytics() {
       <ChartCard title="Full Year Compliance & Approval Trend" subtitle="Monthly overview of compliance scores and approval volumes">
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={complianceTrendData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+            <LineChart data={trend} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" />
               <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />

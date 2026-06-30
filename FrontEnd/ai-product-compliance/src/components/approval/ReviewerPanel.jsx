@@ -1,8 +1,15 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiUser, FiClock, FiAlertCircle, FiStar } from 'react-icons/fi';
-import { users } from '../../data/dashboardData';
+import { FiAlertCircle } from 'react-icons/fi';
+import { getUsers } from '../../services/userService';
 
 export default function ReviewerPanel() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    getUsers().then(setUsers).catch(() => setUsers([]));
+  }, []);
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-5">
       <div>
