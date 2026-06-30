@@ -27,6 +27,7 @@ export default function Approval() {
 
   const handleRequestChanges = async (id, comment) => {
     await requestChanges(id, comment);
+    updateProduct(id, { status: 'revision', reviewComment: comment });
   };
 
   return (

@@ -10,7 +10,14 @@ import { StatusBadge, RiskBadge } from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import { dummyProducts } from '../../data/dummyProducts';
 import { analyzeProduct } from '../../services/aiService';
+import { approveProduct, rejectProduct, requestChanges } from '../../services/approvalService';
 import { formatCurrency, formatDate } from '../../utils/helpers';
+
+const DECISION_CONFIG = {
+  approve: { status: 'approved', run: approveProduct, message: 'Product approved.' },
+  reject: { status: 'rejected', run: rejectProduct, message: 'Product rejected.' },
+  changes: { status: 'revision', run: requestChanges, message: 'Changes requested.' },
+};
 
 export default function ComplianceReport() {
   const navigate = useNavigate();
@@ -18,6 +25,23 @@ export default function ComplianceReport() {
   const [product, setProduct] = useState(null);
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [decision, setDecision] = useState(null);
+  const [submitting, setSubmitting] = useState(null);
+
+  const handleDecision = async (type) => {
+    if (!product?.id || submitting) return;
+    const config = DECISION_CONFIG[type];
+    setSubmitting(type);
+    try {
+      await config.run(product.id);
+      setProduct(prev => ({ ...prev, status: config.status }));
+      setDecision({ type, message: config.message });
+    } catch (err) {
+      console.error('Decision failed:', err);
+    } finally {
+      setSubmitting(null);
+    }
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -125,15 +149,50 @@ export default function ComplianceReport() {
             className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-3"
           >
             <h3 className="text-sm font-600 text-gray-900">Review Decision</h3>
-            <Button variant="success" fullWidth icon={FiCheck} onClick={() => navigate('/approval')}>
-              Approve Product
-            </Button>
-            <Button variant="secondary" fullWidth icon={FiEdit} onClick={() => navigate('/approval')}>
-              Request Changes
-            </Button>
-            <Button variant="danger" fullWidth icon={FiX} onClick={() => navigate('/approval')}>
-              Reject Product
-            </Button>
+            {decision ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-100 rounded-lg">
+                  <FiCheck className="w-4 h-4 text-green-600 flex-shrink-0" />
+                  <p className="text-sm font-500 text-green-800">{decision.message}</p>
+                </div>
+                <Button variant="secondary" fullWidth onClick={() => navigate('/approval')}>
+                  Go to Approval Queue
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button
+                  variant="success"
+                  fullWidth
+                  icon={FiCheck}
+                  loading={submitting === 'approve'}
+                  disabled={!!submitting}
+                  onClick={() => handleDecision('approve')}
+                >
+                  Approve Product
+                </Button>
+                <Button
+                  variant="secondary"
+                  fullWidth
+                  icon={FiEdit}
+                  loading={submitting === 'changes'}
+                  disabled={!!submitting}
+                  onClick={() => handleDecision('changes')}
+                >
+                  Request Changes
+                </Button>
+                <Button
+                  variant="danger"
+                  fullWidth
+                  icon={FiX}
+                  loading={submitting === 'reject'}
+                  disabled={!!submitting}
+                  onClick={() => handleDecision('reject')}
+                >
+                  Reject Product
+                </Button>
+              </>
+            )}
           </motion.div>
         </div>
 
