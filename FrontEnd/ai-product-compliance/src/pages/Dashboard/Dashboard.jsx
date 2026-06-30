@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FiPackage, FiShield, FiClock, FiXCircle, FiAlertTriangle, FiAlertCircle, FiInfo, FiCheckCircle, FiArrowRight } from 'react-icons/fi';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
@@ -7,6 +8,7 @@ import ComplianceChart from '../../components/dashboard/ComplianceChart';
 import RecentProducts from '../../components/dashboard/RecentProducts';
 import QuickActions from '../../components/dashboard/QuickActions';
 import { kpiData, categoryDistribution, recentAlerts } from '../../data/dashboardData';
+import { useProducts } from '../../hooks/useProducts';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
 
@@ -22,6 +24,29 @@ const alertTypeStyles = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { products } = useProducts();
+
+  // Derive KPI values from the live product catalog, keeping the
+  // trend/change/icon/color styling defined in kpiData.
+  const kpis = useMemo(() => {
+    const total = products.length;
+    const pending = products.filter(p => p.status === 'pending').length;
+    const rejected = products.filter(p => p.status === 'rejected').length;
+    const avgScore = total
+      ? products.reduce((sum, p) => sum + (Number(p.complianceScore) || 0), 0) / total
+      : 0;
+
+    const liveValues = {
+      'Total Products': total,
+      'Compliance Rate': `${avgScore.toFixed(1)}%`,
+      'Pending Review': pending,
+      'Rejected Products': rejected,
+    };
+
+    return kpiData.map(kpi =>
+      kpi.label in liveValues ? { ...kpi, value: liveValues[kpi.label] } : kpi
+    );
+  }, [products]);
 
   return (
     <div className="space-y-6">
@@ -38,7 +63,7 @@ export default function Dashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpiData.map((kpi, i) => {
+        {kpis.map((kpi, i) => {
           const Icon = iconMap[kpi.icon];
           return (
             <StatCard
