@@ -7,14 +7,15 @@ import {
 } from 'react-icons/fi';
 import { getNotifications, markAllNotificationsRead } from '../services/metaService';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar({ onMenuClick }) {
   const { currentUser, logout } = useAuth();
+  const { isDark, toggleDark } = useTheme();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
 
-  const [isDark, setIsDark] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function Navbar({ onMenuClick }) {
   };
 
   return (
-    <header className="sticky top-0 z-30 h-16 flex items-center px-4 sm:px-6 gap-4" style={{ background: '#F0FAF8', borderBottom: '1px solid #BDD8D3' }}>
+    <header className="sticky top-0 z-30 h-16 flex items-center px-4 sm:px-6 gap-4" style={{ background: isDark ? '#0F2421' : '#F0FAF8', borderBottom: `1px solid ${isDark ? 'rgba(43,160,144,0.15)' : '#BDD8D3'}` }}>
       {/* Hamburger */}
       <button
         onClick={onMenuClick}
@@ -66,7 +67,7 @@ export default function Navbar({ onMenuClick }) {
         <button
           onClick={() => window.dispatchEvent(new Event('open-command-palette'))}
           className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-lg text-sm transition-all text-left"
-          style={{ background: '#C5E8E3', border: '1px solid #BDD8D3', color: '#7EC8BE' }}
+          style={{ background: isDark ? '#182E2B' : '#C5E8E3', border: `1px solid ${isDark ? 'rgba(43,160,144,0.2)' : '#BDD8D3'}`, color: '#7EC8BE' }}
           onMouseEnter={e => { e.currentTarget.style.borderColor = '#2BA090'; e.currentTarget.style.background = '#BBE0DA'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = '#BDD8D3'; e.currentTarget.style.background = '#C5E8E3'; }}
         >
@@ -83,7 +84,7 @@ export default function Navbar({ onMenuClick }) {
       <div className="flex items-center gap-2 ml-auto">
         {/* Theme toggle */}
         <button
-          onClick={() => setIsDark(!isDark)}
+          onClick={toggleDark}
           className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
         >
           {isDark ? <FiSun className="w-4 h-4" /> : <FiMoon className="w-4 h-4" />}
