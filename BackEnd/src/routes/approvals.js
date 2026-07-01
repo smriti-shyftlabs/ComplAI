@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { Approvals, AuditLogs, Products, Reports } from '../seed.js';
-import { generateId } from '../utils.js';
+import { generateId, randomReviewer } from '../utils.js';
 import { sendDecisionEmail } from '../mailer.js';
 
 const router = Router();
@@ -54,7 +54,7 @@ const DECISIONS = {
 for (const [action, cfg] of Object.entries(DECISIONS)) {
   router.post(`/:productId/${action}`, (req, res) => {
     const { comment = '', reviewerId = 'USR-001' } = req.body || {};
-    const reviewerName = 'Sarah Johnson';
+    const reviewerName = randomReviewer();
     const patch = { status: cfg.status, reviewComment: comment, reviewedBy: reviewerName, [cfg.stamp]: new Date().toISOString() };
     const updated = Products().update(req.params.productId, patch);
     if (!updated) return res.status(404).json({ error: `Product ${req.params.productId} not found` });

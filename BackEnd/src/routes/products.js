@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { Products, AuditLogs } from '../seed.js';
-import { generateId } from '../utils.js';
+import { generateId, randomReviewer } from '../utils.js';
 
 const router = Router();
 
@@ -64,7 +64,7 @@ router.post('/', (req, res) => {
     tags: data.tags || [],
   };
   const inserted = Products().insert(newProduct);
-  auditLog(inserted.id, 'Created', 'Admin User', 'Product submitted for compliance review');
+  auditLog(inserted.id, 'Created', randomReviewer(), 'Product submitted for compliance review');
   res.status(201).json(inserted);
 });
 
@@ -77,14 +77,14 @@ router.patch('/:id', (req, res) => {
 router.delete('/:id', (req, res) => {
   const deleted = Products().delete(req.params.id);
   if (!deleted) return res.status(404).json({ error: `Product ${req.params.id} not found` });
-  auditLog(req.params.id, 'Deleted', 'Admin User', `Product "${deleted.name}" removed`);
+  auditLog(req.params.id, 'Deleted', randomReviewer(), `Product "${deleted.name}" removed`);
   res.json(deleted);
 });
 
 router.post('/:id/publish', (req, res) => {
   const updated = Products().update(req.params.id, { status: 'published', publishedAt: new Date().toISOString() });
   if (!updated) return res.status(404).json({ error: `Product ${req.params.id} not found` });
-  auditLog(req.params.id, 'Published', 'Admin User', 'Product published to marketplace');
+  auditLog(req.params.id, 'Published', randomReviewer(), 'Product published to marketplace');
   res.json(updated);
 });
 
