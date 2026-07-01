@@ -52,7 +52,7 @@ export default function Register({ onSwitchToLogin }) {
     : form.password.length < 10 ? 2
     : 3;
   const strengthLabel = ['', 'Weak', 'Fair', 'Strong'];
-  const strengthColor = ['', 'bg-red-400', 'bg-amber-400', 'bg-emerald-500'];
+  const strengthColor = ['', 'bg-red-400', 'bg-amber-400', 'bg-teal-600'];
 
   return (
     <motion.div
@@ -151,7 +151,7 @@ export default function Register({ onSwitchToLogin }) {
               className={`${inputCls} pr-11`}
             />
             {form.confirmPassword && form.password === form.confirmPassword && (
-              <FiCheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 w-4 h-4" />
+              <FiCheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-600 w-4 h-4" />
             )}
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function Register({ onSwitchToLogin }) {
         <button
           type="submit"
           disabled={authLoading}
-          className="w-full h-11 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-indigo-600/25 mt-1"
+          className="w-full h-11 bg-gradient-to-r from-violet-600 to-teal-700 hover:from-violet-700 hover:to-teal-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-indigo-600/25 mt-1"
         >
           {authLoading ? (
             <>

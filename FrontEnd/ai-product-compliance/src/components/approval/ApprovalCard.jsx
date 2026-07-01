@@ -72,7 +72,7 @@ export default function ApprovalCard({ product, onApprove, onReject, onRequestCh
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Add a review comment (optional)..."
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-600"
               />
             </motion.div>
           )}
@@ -110,7 +110,7 @@ export default function ApprovalCard({ product, onApprove, onReject, onRequestCh
               <FiMessageSquare className="w-3.5 h-3.5" />
               {showComment ? 'Hide' : 'Add'} comment
               {comment.trim() && (
-                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-blue-100 text-blue-600 text-[10px] font-700">
+                <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-teal-100 text-teal-700 text-[10px] font-700">
                   1
                 </span>
               )}

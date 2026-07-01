@@ -1,23 +1,46 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import AIChat from '../components/chat/AIChat';
+import CommandPalette from '../components/common/CommandPalette';
 
 export default function MainLayout({ children }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);   // mobile
+  const [sidebarExpanded, setSidebarExpanded] = useState(true); // desktop hover state
+  const collapseTimer = useRef(null);
+
+  const handleSidebarEnter = () => {
+    clearTimeout(collapseTimer.current);
+    setSidebarExpanded(true);
+  };
+
+  const handleSidebarLeave = () => {
+    collapseTimer.current = setTimeout(() => setSidebarExpanded(false), 180);
+  };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {/* Sidebar - hidden on mobile, always visible on lg+ */}
-      <div className="hidden lg:flex lg:flex-shrink-0">
-        <div className="w-64">
-          <Sidebar isOpen={true} onClose={() => {}} />
-        </div>
+    <div className="flex h-screen overflow-hidden" style={{ background: '#F0FAF8' }}>
+      {/* Desktop Sidebar — hover to expand */}
+      <div
+        className="hidden lg:flex lg:flex-shrink-0 transition-all duration-300"
+        style={{ width: sidebarExpanded ? 256 : 72 }}
+        onMouseEnter={handleSidebarEnter}
+        onMouseLeave={handleSidebarLeave}
+      >
+        <Sidebar
+          isOpen={true}
+          onClose={() => {}}
+          isCollapsed={!sidebarExpanded}
+        />
       </div>
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          isCollapsed={false}
+        />
       </div>
 
       {/* Main content */}
@@ -30,8 +53,9 @@ export default function MainLayout({ children }) {
         </main>
       </div>
 
-      {/* Floating AI Chat */}
+      {/* Global overlays */}
       <AIChat />
+      <CommandPalette />
     </div>
   );
 }

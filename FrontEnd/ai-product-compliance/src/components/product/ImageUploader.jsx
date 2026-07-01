@@ -45,7 +45,7 @@ export default function ImageUploader({ images = [], onChange, maxImages = 8, la
                 className="w-full h-full object-cover rounded-xl border border-gray-200"
               />
               {i === 0 && (
-                <span className="absolute bottom-1 left-1 text-xs bg-blue-600 text-white px-1.5 py-0.5 rounded-md font-500">Main</span>
+                <span className="absolute bottom-1 left-1 text-xs bg-teal-700 text-white px-1.5 py-0.5 rounded-md font-500">Main</span>
               )}
               <button
                 type="button"
@@ -65,7 +65,7 @@ export default function ImageUploader({ images = [], onChange, maxImages = 8, la
             onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
             onDragLeave={() => setDragging(false)}
             onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files); }}
-            className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-all ${dragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'}`}
+            className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 transition-all ${dragging ? 'border-teal-600 bg-teal-50' : 'border-gray-300 hover:border-teal-400 hover:bg-gray-50'}`}
           >
             <FiPlus className="w-4 h-4 text-gray-400" />
             <span className="text-xs text-gray-400">Add</span>

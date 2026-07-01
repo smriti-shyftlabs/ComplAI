@@ -1,8 +1,8 @@
 const variants = {
-  success: 'bg-green-100 text-green-800 border-green-200',
+  success: 'bg-teal-100 text-teal-900 border-teal-200',
   warning: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   danger: 'bg-red-100 text-red-800 border-red-200',
-  info: 'bg-blue-100 text-blue-800 border-blue-200',
+  info: 'bg-teal-100 text-teal-900 border-teal-200',
   gray: 'bg-gray-100 text-gray-700 border-gray-200',
   purple: 'bg-purple-100 text-purple-800 border-purple-200',
   orange: 'bg-orange-100 text-orange-800 border-orange-200',
@@ -10,10 +10,10 @@ const variants = {
 };
 
 const dotColors = {
-  success: 'bg-green-500',
+  success: 'bg-teal-600',
   warning: 'bg-yellow-500',
   danger: 'bg-red-500',
-  info: 'bg-blue-500',
+  info: 'bg-teal-600',
   gray: 'bg-gray-400',
   purple: 'bg-purple-500',
   orange: 'bg-orange-500',

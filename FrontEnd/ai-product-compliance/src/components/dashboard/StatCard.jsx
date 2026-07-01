@@ -22,8 +22,9 @@ function useCounter(target, duration = 1500) {
 }
 
 const colorConfig = {
-  blue: { icon: 'bg-blue-100 text-blue-600', border: 'border-l-blue-500' },
-  green: { icon: 'bg-green-100 text-green-600', border: 'border-l-green-500' },
+  teal: { icon: 'bg-teal-100 text-teal-700', border: 'border-l-teal-600' },
+  blue: { icon: 'bg-teal-100 text-teal-700', border: 'border-l-teal-600' },
+  green: { icon: 'bg-teal-100 text-teal-700', border: 'border-l-teal-600' },
   yellow: { icon: 'bg-yellow-100 text-yellow-600', border: 'border-l-yellow-500' },
   red: { icon: 'bg-red-100 text-red-600', border: 'border-l-red-500' },
   purple: { icon: 'bg-purple-100 text-purple-600', border: 'border-l-purple-500' }
@@ -62,7 +63,7 @@ export default function StatCard({ label, value, trend, change, icon: Icon, colo
       </div>
 
       {change !== undefined && (
-        <div className={`flex items-center gap-1.5 mt-3 text-sm ${isPositive ? 'text-green-600' : 'text-red-500'}`}>
+        <div className={`flex items-center gap-1.5 mt-3 text-sm ${isPositive ? 'text-teal-700' : 'text-red-500'}`}>
           {isUp ? <FiTrendingUp className="w-3.5 h-3.5" /> : <FiTrendingDown className="w-3.5 h-3.5" />}
           <span className="font-600">{Math.abs(change)}%</span>
           <span className="text-gray-400 font-400">vs last month</span>

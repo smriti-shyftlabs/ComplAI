@@ -24,8 +24,8 @@ export default function PublishedProducts() {
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Published', value: published.length, icon: FiGlobe, color: 'bg-green-50 text-green-700' },
-          { label: 'Avg Compliance', value: `${Math.round(published.reduce((s, p) => s + p.complianceScore, 0) / (published.length || 1))}%`, icon: FiStar, color: 'bg-blue-50 text-blue-700' },
+          { label: 'Total Published', value: published.length, icon: FiGlobe, color: 'bg-teal-50 text-teal-800' },
+          { label: 'Avg Compliance', value: `${Math.round(published.reduce((s, p) => s + p.complianceScore, 0) / (published.length || 1))}%`, icon: FiStar, color: 'bg-teal-50 text-teal-800' },
           { label: 'High Compliance (90+)', value: published.filter(p => p.complianceScore >= 90).length, icon: FiStar, color: 'bg-purple-50 text-purple-700' },
           { label: 'Need Review', value: published.filter(p => p.complianceScore < 75).length, icon: FiStar, color: 'bg-yellow-50 text-yellow-700' }
         ].map(stat => (
@@ -41,7 +41,7 @@ export default function PublishedProducts() {
         <span className="text-sm text-gray-500">Listed on:</span>
         {marketplaces.map(m => (
           <span key={m} className="text-xs font-600 px-3 py-1.5 bg-white border border-gray-200 rounded-full text-gray-700 flex items-center gap-1.5 shadow-sm">
-            <FiGlobe className="w-3 h-3 text-blue-500" />
+            <FiGlobe className="w-3 h-3 text-teal-600" />
             {m}
           </span>
         ))}

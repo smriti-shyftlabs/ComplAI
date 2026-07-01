@@ -13,7 +13,7 @@ export default function Navbar({ onMenuClick }) {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+
   const [isDark, setIsDark] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
@@ -41,38 +41,42 @@ export default function Navbar({ onMenuClick }) {
   };
 
   const typeColors = {
-    action: 'bg-blue-500', warning: 'bg-yellow-500',
-    success: 'bg-green-500', error: 'bg-red-500', info: 'bg-gray-400',
+    action: 'bg-teal-600', warning: 'bg-yellow-500',
+    success: 'bg-teal-600', error: 'bg-red-500', info: 'bg-gray-400',
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-200 h-16 flex items-center px-4 sm:px-6 gap-4">
+    <header className="sticky top-0 z-30 h-16 flex items-center px-4 sm:px-6 gap-4" style={{ background: '#F0FAF8', borderBottom: '1px solid #BDD8D3' }}>
       {/* Hamburger */}
       <button
         onClick={onMenuClick}
-        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
+        className="lg:hidden p-2 rounded-lg transition-colors" style={{ color: '#2BA090' }}
       >
         <FiMenu className="w-5 h-5" />
       </button>
 
       {/* Greeting */}
       <div className="hidden sm:block">
-        <p className="text-sm font-semibold text-gray-900">{getGreeting()}, {currentUser?.name?.split(' ')[0] || 'User'}</p>
-        <p className="text-xs text-gray-500">Welcome back to ComplAI</p>
+        <p className="text-sm font-semibold" style={{ color: '#0C3530' }}>{getGreeting()}, {currentUser?.name?.split(' ')[0] || 'User'}</p>
+        <p className="text-xs" style={{ color: '#2BA090' }}>Welcome back to ComplAI</p>
       </div>
 
-      {/* Search */}
+      {/* Search — opens command palette */}
       <div className="flex-1 max-w-md mx-auto">
-        <div className="relative">
-          <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Search products, rules, reports..."
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all"
-          />
-        </div>
+        <button
+          onClick={() => window.dispatchEvent(new Event('open-command-palette'))}
+          className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-lg text-sm transition-all text-left"
+          style={{ background: '#C5E8E3', border: '1px solid #BDD8D3', color: '#7EC8BE' }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = '#2BA090'; e.currentTarget.style.background = '#BBE0DA'; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = '#BDD8D3'; e.currentTarget.style.background = '#C5E8E3'; }}
+        >
+          <FiSearch style={{ width: 15, height: 15, flexShrink: 0, color: '#2BA090' }} />
+          <span style={{ flex: 1, fontWeight: 500, fontSize: '0.82rem' }}>Search or jump to...</span>
+          <span className="hidden sm:flex items-center gap-0.5">
+            <kbd style={{ background: '#F0FAF8', border: '1px solid #BDD8D3', borderRadius: 4, padding: '1px 5px', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.6rem', color: '#2BA090' }}>⌘</kbd>
+            <kbd style={{ background: '#F0FAF8', border: '1px solid #BDD8D3', borderRadius: 4, padding: '1px 5px', fontFamily: 'inherit', fontWeight: 700, fontSize: '0.6rem', color: '#2BA090' }}>K</kbd>
+          </span>
+        </button>
       </div>
 
       {/* Right actions */}
@@ -109,11 +113,11 @@ export default function Navbar({ onMenuClick }) {
               >
                 <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
                   <span className="text-sm font-semibold text-gray-900">Notifications</span>
-                  <button onClick={markAllRead} className="text-xs text-blue-600 cursor-pointer hover:underline">Mark all read</button>
+                  <button onClick={markAllRead} className="text-xs text-teal-700 cursor-pointer hover:underline">Mark all read</button>
                 </div>
                 <div className="max-h-80 overflow-y-auto">
                   {notifications.map(n => (
-                    <div key={n.id} className={`flex gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 ${!n.read ? 'bg-blue-50/40' : ''}`}>
+                    <div key={n.id} className={`flex gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 ${!n.read ? 'bg-teal-50/40' : ''}`}>
                       <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${typeColors[n.type] || 'bg-gray-400'}`} />
                       <div className="flex-1 min-w-0">
                         <p className={`text-xs font-semibold ${!n.read ? 'text-gray-900' : 'text-gray-700'}`}>{n.title}</p>
@@ -124,7 +128,7 @@ export default function Navbar({ onMenuClick }) {
                   ))}
                 </div>
                 <div className="px-4 py-2.5 border-t border-gray-100 text-center">
-                  <span className="text-xs text-blue-600 cursor-pointer hover:underline">View all notifications</span>
+                  <span className="text-xs text-teal-700 cursor-pointer hover:underline">View all notifications</span>
                 </div>
               </motion.div>
             )}
@@ -137,7 +141,7 @@ export default function Navbar({ onMenuClick }) {
             onClick={() => { setShowProfile(p => !p); setShowNotifications(false); }}
             className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center shadow-sm">
               <span className="text-white text-xs font-semibold">{currentUser?.avatar || 'U'}</span>
             </div>
             <div className="hidden sm:block text-left">
@@ -159,7 +163,7 @@ export default function Navbar({ onMenuClick }) {
                 <div className="px-4 py-3 border-b border-gray-100">
                   <p className="text-sm font-semibold text-gray-900">{currentUser?.name}</p>
                   <p className="text-xs text-gray-500">{currentUser?.email}</p>
-                  <span className="inline-block mt-1 text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">{currentUser?.role}</span>
+                  <span className="inline-block mt-1 text-xs bg-teal-50 text-teal-700 px-2 py-0.5 rounded-full font-medium">{currentUser?.role}</span>
                 </div>
                 <button
                   onClick={() => { navigate('/settings'); setShowProfile(false); }}

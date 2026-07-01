@@ -7,14 +7,14 @@ const actions = [
     icon: FiPlusCircle,
     label: 'Add Product',
     description: 'Upload and submit for review',
-    color: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
+    color: 'bg-teal-50 text-teal-700 hover:bg-teal-100',
     path: '/products'
   },
   {
     icon: FiShield,
     label: 'Run Compliance Check',
     description: 'Analyze pending products',
-    color: 'bg-green-50 text-green-600 hover:bg-green-100',
+    color: 'bg-teal-50 text-teal-700 hover:bg-teal-100',
     path: '/compliance'
   },
   {

@@ -82,7 +82,7 @@ export default function ComplianceReport() {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin w-8 h-8 text-teal-700" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -126,7 +126,7 @@ export default function ComplianceReport() {
             <div className="w-full mt-6 space-y-2 text-sm">
               {[
                 { label: 'Rules Checked', value: report?.rulesChecked || 20 },
-                { label: 'Rules Passed', value: report?.rulesPassed, color: 'text-green-600' },
+                { label: 'Rules Passed', value: report?.rulesPassed, color: 'text-teal-700' },
                 { label: 'Rules Failed', value: report?.rulesFailed, color: 'text-red-600' },
                 { label: 'AI Confidence', value: `${report?.confidence || 94}%` }
               ].map(item => (
@@ -169,9 +169,9 @@ export default function ComplianceReport() {
             <h3 className="text-sm font-600 text-gray-900">Review Decision</h3>
             {decision ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-100 rounded-lg">
-                  <FiCheck className="w-4 h-4 text-green-600 flex-shrink-0" />
-                  <p className="text-sm font-500 text-green-800">{decision.message}</p>
+                <div className="flex items-center gap-2 p-3 bg-teal-50 border border-teal-100 rounded-lg">
+                  <FiCheck className="w-4 h-4 text-teal-700 flex-shrink-0" />
+                  <p className="text-sm font-500 text-teal-900">{decision.message}</p>
                 </div>
                 {decision.type === 'approve' && (
                   <Button

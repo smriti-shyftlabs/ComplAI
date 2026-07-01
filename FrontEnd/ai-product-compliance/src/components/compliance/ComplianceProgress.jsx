@@ -23,7 +23,7 @@ export default function ComplianceProgress({ progress }) {
             <motion.circle
               cx="48" cy="48" r="40"
               fill="none"
-              stroke="#3B82F6"
+              stroke="#2BA090"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={251.2}
@@ -32,7 +32,7 @@ export default function ComplianceProgress({ progress }) {
             />
           </svg>
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-2xl font-700 text-blue-600">{percentage}%</span>
+            <span className="text-2xl font-700 text-teal-700">{percentage}%</span>
           </div>
         </div>
         <p className="text-lg font-600 text-gray-900">Analyzing Product</p>
@@ -41,7 +41,7 @@ export default function ComplianceProgress({ progress }) {
             key={progress.label}
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-blue-600 mt-1"
+            className="text-sm text-teal-700 mt-1"
           >
             {progress.label}...
           </motion.p>
@@ -61,7 +61,7 @@ export default function ComplianceProgress({ progress }) {
               transition={{ delay: i * 0.05 }}
               className="flex items-center gap-3"
             >
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${isDone ? 'bg-green-500' : isActive ? 'bg-blue-600' : 'bg-gray-100'}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${isDone ? 'bg-teal-600' : isActive ? 'bg-teal-700' : 'bg-gray-100'}`}>
                 {isDone ? (
                   <FiCheck className="w-3.5 h-3.5 text-white" />
                 ) : isActive ? (
@@ -74,7 +74,7 @@ export default function ComplianceProgress({ progress }) {
                   <span className="text-xs text-gray-400 font-600">{stepNum}</span>
                 )}
               </div>
-              <span className={`text-sm transition-colors ${isDone ? 'text-green-600 line-through' : isActive ? 'text-blue-600 font-600' : 'text-gray-400'}`}>
+              <span className={`text-sm transition-colors ${isDone ? 'text-teal-700 line-through' : isActive ? 'text-teal-700 font-600' : 'text-gray-400'}`}>
                 {step}
               </span>
             </motion.div>

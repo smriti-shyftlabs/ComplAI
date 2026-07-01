@@ -22,7 +22,7 @@ export default function ReviewerPanel() {
               animate={{ opacity: 1, x: 0 }}
               className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
             >
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center flex-shrink-0">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-xs font-600">{user.avatar}</span>
               </div>
               <div className="flex-1 min-w-0">
@@ -30,7 +30,7 @@ export default function ReviewerPanel() {
                 <p className="text-xs text-gray-500">{user.role}</p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-xs font-600 text-green-600">{user.approvalRate}</p>
+                <p className="text-xs font-600 text-teal-700">{user.approvalRate}</p>
                 <p className="text-xs text-gray-400">{user.productsReviewed} reviewed</p>
               </div>
             </motion.div>
@@ -42,8 +42,8 @@ export default function ReviewerPanel() {
         <h3 className="text-sm font-600 text-gray-900 mb-3">SLA Status</h3>
         <div className="space-y-2">
           {[
-            { label: 'Reviewed within 24h', value: '73%', color: 'bg-green-500', width: '73%' },
-            { label: 'Reviewed within 48h', value: '91%', color: 'bg-blue-500', width: '91%' },
+            { label: 'Reviewed within 24h', value: '73%', color: 'bg-teal-600', width: '73%' },
+            { label: 'Reviewed within 48h', value: '91%', color: 'bg-teal-600', width: '91%' },
             { label: 'SLA Breaches', value: '4%', color: 'bg-red-500', width: '4%' }
           ].map(item => (
             <div key={item.label}>
@@ -74,7 +74,7 @@ export default function ReviewerPanel() {
             { label: 'Critical Risk', count: 3, color: 'text-red-600 bg-red-50' },
             { label: 'High Risk', count: 8, color: 'text-orange-600 bg-orange-50' },
             { label: 'Medium Risk', count: 21, color: 'text-yellow-600 bg-yellow-50' },
-            { label: 'Low Risk', count: 15, color: 'text-green-600 bg-green-50' }
+            { label: 'Low Risk', count: 15, color: 'text-teal-700 bg-teal-50' }
           ].map(item => (
             <div key={item.label} className={`flex items-center justify-between px-3 py-2 rounded-lg ${item.color}`}>
               <span className="text-xs font-500">{item.label}</span>

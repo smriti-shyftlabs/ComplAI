@@ -86,7 +86,7 @@ export default function Approval() {
                 <button
                   key={r}
                   onClick={() => setRiskFilter(r)}
-                  className={`text-xs px-3 py-1.5 rounded-full border font-500 capitalize transition-all ${riskFilter === r ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                  className={`text-xs px-3 py-1.5 rounded-full border font-500 capitalize transition-all ${riskFilter === r ? 'bg-teal-700 text-white border-teal-700' : 'text-gray-600 border-gray-200 hover:border-gray-300'}`}
                 >
                   {r === 'all' ? 'All' : `${r} risk`}
                 </button>
@@ -97,8 +97,8 @@ export default function Approval() {
               <div className="text-center py-12 text-gray-400">Loading...</div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-                <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>

@@ -100,7 +100,7 @@ export default function Login({ onSwitchToRegister }) {
         <button
           type="submit"
           disabled={authLoading}
-          className="w-full h-11 bg-gradient-to-r from-violet-600 to-blue-600 hover:from-violet-700 hover:to-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-indigo-600/25"
+          className="w-full h-11 bg-gradient-to-r from-violet-600 to-teal-700 hover:from-violet-700 hover:to-teal-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-indigo-600/25"
         >
           {authLoading ? (
             <>
@@ -124,7 +124,7 @@ export default function Login({ onSwitchToRegister }) {
         <div className="grid grid-cols-2 gap-2.5">
           {[
             { label: 'Admin', email: 'admin@company.com', password: 'admin123', tint: 'bg-violet-50 hover:bg-violet-100/70 ring-violet-100', name: 'text-violet-700', avatar: 'bg-violet-100 text-violet-600' },
-            { label: 'Reviewer', email: 'sarah.johnson@company.com', password: 'sarah123', tint: 'bg-blue-50 hover:bg-blue-100/70 ring-blue-100', name: 'text-blue-700', avatar: 'bg-blue-100 text-blue-600' },
+            { label: 'Reviewer', email: 'sarah.johnson@company.com', password: 'sarah123', tint: 'bg-teal-50 hover:bg-teal-100/70 ring-teal-100', name: 'text-teal-800', avatar: 'bg-teal-100 text-teal-700' },
           ].map(acc => (
             <button
               key={acc.label}

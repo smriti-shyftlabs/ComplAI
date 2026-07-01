@@ -59,8 +59,8 @@ export default function Analytics() {
   }));
 
   const kpis = [
-    { label: 'Avg Compliance Score', value: data ? `${data.kpi.avgComplianceScore}%` : '—', color: 'bg-blue-600' },
-    { label: 'AI Accuracy', value: '96.8%', color: 'bg-green-600' },
+    { label: 'Avg Compliance Score', value: data ? `${data.kpi.avgComplianceScore}%` : '—', color: 'bg-teal-700' },
+    { label: 'AI Accuracy', value: '96.8%', color: 'bg-teal-700' },
     { label: 'Approval Rate', value: data ? `${data.kpi.approvalRate}%` : '—', color: 'bg-purple-600' },
     { label: 'Reports Generated', value: data ? data.kpi.reportsGenerated : '—', color: 'bg-orange-500' },
   ];
@@ -93,7 +93,7 @@ export default function Analytics() {
                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#94A3B8' }} angle={-30} textAnchor="end" axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} domain={[0, 100]} axisLine={false} tickLine={false} />
                 <Tooltip formatter={(v) => [`${v}%`, 'Avg Score']} />
-                <Bar dataKey="avg" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="avg" fill="#2BA090" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -165,7 +165,7 @@ export default function Analytics() {
               <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} axisLine={false} tickLine={false} />
               <Tooltip />
               <Legend formatter={(v) => <span className="text-xs text-gray-600">{v}</span>} />
-              <Line type="monotone" dataKey="score" name="Compliance Score %" stroke="#3B82F6" strokeWidth={2.5} dot={{ r: 3 }} />
+              <Line type="monotone" dataKey="score" name="Compliance Score %" stroke="#2BA090" strokeWidth={2.5} dot={{ r: 3 }} />
               <Line type="monotone" dataKey="approved" name="Approved" stroke="#10B981" strokeWidth={2} dot={{ r: 3 }} />
               <Line type="monotone" dataKey="rejected" name="Rejected" stroke="#EF4444" strokeWidth={2} dot={{ r: 3 }} />
             </LineChart>

@@ -37,7 +37,7 @@ const Input = forwardRef(function Input({
           disabled={disabled}
           className={`
             w-full rounded-lg border text-sm text-gray-900 placeholder-gray-400
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+            focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
             disabled:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400
             transition-all duration-150
             ${Icon && iconPosition === 'left' ? 'pl-9' : 'pl-3'}
