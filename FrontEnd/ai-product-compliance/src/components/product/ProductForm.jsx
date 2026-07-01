@@ -59,7 +59,7 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
             value={values.sku || ''} onChange={e => onChange('sku', e.target.value)} />
           <Input label="Price ($)" required type="number" placeholder="0.00" icon={FiDollarSign} min="0" step="0.01"
             value={values.price || ''} onChange={e => onChange('price', e.target.value)} error={errors.price} />
-          <Input label="Product" placeholder="e.g. Laptop"
+          <Input label="Product" required placeholder="e.g. Laptop"
             value={values.productType || ''} onChange={e => onChange('productType', e.target.value)} error={errors.productType} />
         </div>
 

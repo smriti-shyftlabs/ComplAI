@@ -7,7 +7,7 @@ export const useCompliance = () => {
   const [progress, setProgress] = useState(null);
   const [error, setError] = useState(null);
 
-  const analyzeProduct = useCallback(async (product, force = false) => {
+  const analyzeProduct = useCallback(async (product) => {
     try {
       setLoading(true);
       setError(null);
@@ -17,7 +17,7 @@ export const useCompliance = () => {
         setProgress(progressData);
       });
 
-      const result = await aiService.analyzeProduct(product, force);
+      const result = await aiService.analyzeProduct(product);
       setComplianceData(result);
       setProgress(null);
       return result;

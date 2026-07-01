@@ -14,8 +14,7 @@ export const getComplianceReport = (productId) => api.get(`/reports/${productId}
 
 export const getAllReports = () => api.get('/reports');
 
-export const analyzeProduct = (product, force = false) =>
-  api.post(`/analyze/${product.id}`, { ...product, force });
+export const analyzeProduct = (product) => api.post(`/analyze/${product.id}`, product);
 
 export const refineDescription = async (payload) =>
   (await api.post('/refine-description', payload)).description;
