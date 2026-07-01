@@ -13,6 +13,7 @@ import misc from './src/routes/misc.js';
 
 initDB();
 
+//create express app
 const app = express();
 
 const corsOrigin = process.env.CORS_ORIGIN
