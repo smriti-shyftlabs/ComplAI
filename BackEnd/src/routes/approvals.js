@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { Approvals, AuditLogs, Products } from '../seed.js';
+import { Approvals, AuditLogs, Products, Reports } from '../seed.js';
 import { generateId } from '../utils.js';
+import { sendDecisionEmail } from '../mailer.js';
 
 const router = Router();
 
@@ -58,6 +59,11 @@ for (const [action, cfg] of Object.entries(DECISIONS)) {
     const updated = Products().update(req.params.productId, patch);
     if (!updated) return res.status(404).json({ error: `Product ${req.params.productId} not found` });
     recordDecision(req.params.productId, cfg.label, comment, reviewerId, reviewerName);
+
+    // Notify the vendor with the compliance report (fire-and-forget).
+    const report = Reports().findOne({ productId: req.params.productId });
+    sendDecisionEmail(updated, cfg.label, comment, report).catch(() => {});
+
     res.json(updated);
   });
 }

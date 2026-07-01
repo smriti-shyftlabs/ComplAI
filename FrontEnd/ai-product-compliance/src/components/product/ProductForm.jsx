@@ -7,7 +7,7 @@
  * update in real time and values survive across the analyze/publish phases.
  */
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiDollarSign, FiHash } from 'react-icons/fi';
+import { FiDollarSign, FiHash, FiMail } from 'react-icons/fi';
 import Input from '../common/Input';
 import CategorySelector from './CategorySelector';
 import ImageUploader from './ImageUploader';
@@ -31,6 +31,9 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
             value={values.name || ''} onChange={e => onChange('name', e.target.value)} error={errors.name} />
           <Input label="Brand" required placeholder="e.g. ZenTech"
             value={values.brand || ''} onChange={e => onChange('brand', e.target.value)} error={errors.brand} />
+          <Input label="Vendor Email" required type="email" placeholder="vendor@company.com" icon={FiMail}
+            value={values.vendorEmail || ''} onChange={e => onChange('vendorEmail', e.target.value)}
+            error={errors.vendorEmail} />
           <Input label="SKU ID" placeholder="e.g. SKU-1001" icon={FiHash}
             value={values.sku || ''} onChange={e => onChange('sku', e.target.value)} />
           <Input label="Price ($)" required type="number" placeholder="0.00" icon={FiDollarSign} min="0" step="0.01"

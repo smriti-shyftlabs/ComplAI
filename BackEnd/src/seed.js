@@ -25,6 +25,7 @@ export const Notifications = () => collection('notifications', { idPrefix: 'NOTI
 export const Users         = () => collection('users', { idPrefix: 'USR' });
 export const Reports       = () => collection('complianceReports', { idPrefix: 'RPT' });
 export const Settings      = () => collection('settings', { idPrefix: 'CFG' });
+export const Emails        = () => collection('emails', { idPrefix: 'MAIL' });
 
 const SETTINGS_SEED = [
   { id: 'CFG-001', key: 'complianceThreshold',      value: 75,   label: 'Minimum Compliance Score', description: 'Products below this score are flagged for review.' },
