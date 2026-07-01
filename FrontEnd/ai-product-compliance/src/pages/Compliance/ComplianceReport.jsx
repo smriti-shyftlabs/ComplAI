@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft, FiCheck, FiX, FiEdit, FiDownload, FiGlobe } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiDownload, FiGlobe } from 'react-icons/fi';
 import ComplianceScore from '../../components/compliance/ComplianceScore';
 import ComplianceChecklist from '../../components/compliance/ComplianceChecklist';
 import AISuggestions from '../../components/compliance/AISuggestions';
@@ -10,14 +10,13 @@ import { StatusBadge, RiskBadge } from '../../components/common/Badge';
 import Button from '../../components/common/Button';
 import { getProducts } from '../../services/productService';
 import { analyzeProduct } from '../../services/aiService';
-import { approveProduct, rejectProduct, requestChanges } from '../../services/approvalService';
+import { approveProduct, rejectProduct } from '../../services/approvalService';
 import { publishProduct } from '../../services/productService';
-import { formatCurrency, formatDate } from '../../utils/helpers';
+import { formatCurrency } from '../../utils/helpers';
 
 const DECISION_CONFIG = {
   approve: { status: 'approved', run: approveProduct, message: 'Product approved.' },
   reject: { status: 'rejected', run: rejectProduct, message: 'Product rejected.' },
-  changes: { status: 'revision', run: requestChanges, message: 'Changes requested.' },
 };
 
 export default function ComplianceReport() {
@@ -206,16 +205,6 @@ export default function ComplianceReport() {
                   onClick={() => handleDecision('approve')}
                 >
                   Approve Product
-                </Button>
-                <Button
-                  variant="secondary"
-                  fullWidth
-                  icon={FiEdit}
-                  loading={submitting === 'changes'}
-                  disabled={!!submitting}
-                  onClick={() => handleDecision('changes')}
-                >
-                  Request Changes
                 </Button>
                 <Button
                   variant="danger"

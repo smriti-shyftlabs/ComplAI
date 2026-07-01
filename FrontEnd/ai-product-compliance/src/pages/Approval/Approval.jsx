@@ -7,7 +7,7 @@ import ApprovalHistory from '../../components/approval/ApprovalHistory';
 import Button from '../../components/common/Button';
 import { StatusBadge, RiskBadge } from '../../components/common/Badge';
 import { useProducts } from '../../hooks/useProducts';
-import { approveProduct, rejectProduct, requestChanges } from '../../services/approvalService';
+import { approveProduct, rejectProduct } from '../../services/approvalService';
 
 const PUBLISH_MIN_SCORE = 75;
 
@@ -29,11 +29,6 @@ export default function Approval() {
   const handleReject = async (id, comment) => {
     await rejectProduct(id, comment);
     updateProduct(id, { status: 'rejected', reviewComment: comment });
-  };
-
-  const handleRequestChanges = async (id, comment) => {
-    await requestChanges(id, comment);
-    updateProduct(id, { status: 'revision', reviewComment: comment });
   };
 
   const handlePublish = async (id) => {
@@ -112,7 +107,6 @@ export default function Approval() {
                   product={product}
                   onApprove={handleApprove}
                   onReject={handleReject}
-                  onRequestChanges={handleRequestChanges}
                   index={i}
                 />
               ))
