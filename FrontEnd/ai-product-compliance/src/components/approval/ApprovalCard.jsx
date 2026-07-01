@@ -1,20 +1,18 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiMessageSquare, FiCheck, FiX, FiEdit } from 'react-icons/fi';
+import { FiMessageSquare, FiCheck, FiX } from 'react-icons/fi';
 import Button from '../common/Button';
 import { StatusBadge, RiskBadge } from '../common/Badge';
 import ComplianceScore from '../compliance/ComplianceScore';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 
-export default function ApprovalCard({ product, onApprove, onReject, onRequestChanges, index = 0 }) {
+export default function ApprovalCard({ product, onApprove, onReject, index = 0 }) {
   const [comment, setComment] = useState('');
   const [showComment, setShowComment] = useState(false);
-  const [action, setAction] = useState(null);
 
   const handleAction = (type) => {
     if (type === 'approve') onApprove?.(product.id, comment);
     else if (type === 'reject') onReject?.(product.id, comment);
-    else if (type === 'changes') onRequestChanges?.(product.id, comment);
   };
 
   return (
@@ -94,14 +92,6 @@ export default function ApprovalCard({ product, onApprove, onReject, onRequestCh
               onClick={() => handleAction('reject')}
             >
               Reject
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              icon={FiEdit}
-              onClick={() => handleAction('changes')}
-            >
-              Request Changes
             </Button>
             <button
               onClick={() => setShowComment(!showComment)}
