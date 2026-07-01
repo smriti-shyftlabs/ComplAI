@@ -176,10 +176,15 @@ Score 0-100 (certificate validity 30%, image quality/count 20%, label requiremen
   return parsed;
 }
 
-/** Analyze a product, cache + persist the report, and update the product. */
-export async function analyzeProduct(product) {
+/**
+ * Analyze a product, cache + persist the report, and update the product.
+ * Pass { force: true } to re-generate after a product was edited (drops the
+ * cached report and re-scores).
+ */
+export async function analyzeProduct(product, { force = false } = {}) {
   const cached = Reports().findOne({ productId: product.id });
-  if (cached) return cached;
+  if (cached && !force) return cached;
+  if (cached && force) Reports().deleteWhere(r => r.productId === product.id);
 
   let result;
   try {

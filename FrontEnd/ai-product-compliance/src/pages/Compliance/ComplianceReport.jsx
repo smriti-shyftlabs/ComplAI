@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft, FiCheck, FiX, FiDownload, FiGlobe, FiChevronRight } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiDownload, FiGlobe, FiEdit2, FiChevronRight } from 'react-icons/fi';
 import ComplianceScore from '../../components/compliance/ComplianceScore';
 import ComplianceChecklist from '../../components/compliance/ComplianceChecklist';
 import AISuggestions from '../../components/compliance/AISuggestions';
@@ -185,7 +185,14 @@ export default function ComplianceReport() {
             <p className="text-sm text-gray-500">{product?.name}</p>
           </div>
         </div>
-        <Button variant="secondary" size="sm" icon={FiDownload}>Export Report</Button>
+        <div className="flex items-center gap-2">
+          {location.state?.fromEditor && (
+            <Button variant="secondary" size="sm" icon={FiEdit2} onClick={() => navigate('/products')}>
+              Continue Editing
+            </Button>
+          )}
+          <Button variant="secondary" size="sm" icon={FiDownload}>Export Report</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
