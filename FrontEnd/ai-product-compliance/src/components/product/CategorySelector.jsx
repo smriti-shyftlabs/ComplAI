@@ -28,9 +28,9 @@ export default function CategorySelector({ value, onChange, label = 'Category', 
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg border text-sm bg-white text-left transition-all
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+          focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
           ${error ? 'border-red-300' : 'border-gray-300 hover:border-gray-400'}
-          ${isOpen ? 'ring-2 ring-blue-500 border-transparent' : ''}
+          ${isOpen ? 'ring-2 ring-teal-600 border-transparent' : ''}
         `}
       >
         <span className={value ? 'text-gray-900' : 'text-gray-400'}>{value || 'Select category...'}</span>
@@ -56,7 +56,7 @@ export default function CategorySelector({ value, onChange, label = 'Category', 
                   placeholder="Search categories..."
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-teal-600"
                 />
               </div>
             </div>
@@ -73,13 +73,13 @@ export default function CategorySelector({ value, onChange, label = 'Category', 
                       disabled={!available}
                       onClick={() => { if (!available) return; onChange(category); setIsOpen(false); setSearch(''); }}
                       className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors rounded-lg mx-1 w-[calc(100%-8px)]
-                        ${available ? 'hover:bg-blue-50 hover:text-blue-700 cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+                        ${available ? 'hover:bg-teal-50 hover:text-teal-800 cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
                     >
-                      <span className={value === category ? 'font-600 text-blue-600' : available ? 'text-gray-700' : 'text-gray-400'}>
+                      <span className={value === category ? 'font-600 text-teal-700' : available ? 'text-gray-700' : 'text-gray-400'}>
                         {category}
                       </span>
                       {value === category ? (
-                        <FiCheck className="w-3.5 h-3.5 text-blue-600" />
+                        <FiCheck className="w-3.5 h-3.5 text-teal-700" />
                       ) : !available ? (
                         <span className="flex items-center gap-1 text-[10px] text-gray-400">
                           <FiLock className="w-3 h-3" /> Coming Soon

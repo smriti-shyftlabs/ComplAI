@@ -64,7 +64,7 @@ export default function AIChat() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl flex items-center justify-center transition-colors"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-teal-700 hover:bg-teal-800 text-white rounded-full shadow-xl flex items-center justify-center transition-colors"
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -93,17 +93,17 @@ export default function AIChat() {
             className="fixed bottom-24 right-6 z-50 w-80 sm:w-96 h-[480px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 flex items-center gap-3">
+            <div className="bg-gradient-to-r from-teal-700 to-teal-800 px-4 py-3 flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                 <FiZap className="w-4 h-4 text-white" />
               </div>
               <div>
                 <p className="text-sm font-600 text-white">ComplAI Assistant</p>
-                <p className="text-xs text-blue-100">Ask me anything about compliance</p>
+                <p className="text-xs text-teal-100">Ask me anything about compliance</p>
               </div>
               <div className="ml-auto flex items-center gap-1">
-                <div className="w-2 h-2 bg-green-400 rounded-full" />
-                <span className="text-xs text-blue-100">Online</span>
+                <div className="w-2 h-2 bg-teal-400 rounded-full" />
+                <span className="text-xs text-teal-100">Online</span>
               </div>
             </div>
 
@@ -124,7 +124,7 @@ export default function AIChat() {
                     <button
                       key={q}
                       onClick={() => sendMessage(q)}
-                      className="text-xs px-2.5 py-1.5 bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-colors border border-blue-100"
+                      className="text-xs px-2.5 py-1.5 bg-teal-50 text-teal-700 rounded-full hover:bg-teal-100 transition-colors border border-teal-100"
                     >
                       {q}
                     </button>
@@ -142,12 +142,12 @@ export default function AIChat() {
                   onChange={e => setInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendMessage()}
                   placeholder="Ask about compliance..."
-                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent"
                 />
                 <button
                   onClick={() => sendMessage()}
                   disabled={!input.trim() || loading}
-                  className="w-9 h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-9 h-9 bg-teal-700 text-white rounded-xl flex items-center justify-center hover:bg-teal-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <FiSend className="w-3.5 h-3.5" />
                 </button>

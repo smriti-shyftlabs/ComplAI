@@ -12,7 +12,7 @@ function Toggle({ enabled, onChange }) {
     <button
       type="button"
       onClick={() => onChange(!enabled)}
-      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${enabled ? 'bg-blue-600' : 'bg-gray-200'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${enabled ? 'bg-teal-700' : 'bg-gray-200'}`}
     >
       <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${enabled ? 'translate-x-5' : 'translate-x-0'}`} />
     </button>
@@ -60,7 +60,7 @@ export default function Settings() {
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex-shrink-0 sm:w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-500 transition-all text-left ${tab === t.id ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}
+                className={`flex-shrink-0 sm:w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-500 transition-all text-left ${tab === t.id ? 'bg-teal-50 text-teal-800' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <t.icon className="w-4 h-4 flex-shrink-0" />
                 <span className="whitespace-nowrap">{t.label}</span>
@@ -95,7 +95,7 @@ export default function Settings() {
                   />
                   <div>
                     <label className="block text-sm font-500 text-gray-700 mb-1.5">Timezone</label>
-                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white">
                       <option>UTC-5 (Eastern)</option>
                       <option>UTC-8 (Pacific)</option>
                       <option>UTC+0 (London)</option>
@@ -104,7 +104,7 @@ export default function Settings() {
                   </div>
                   <div>
                     <label className="block text-sm font-500 text-gray-700 mb-1.5">Language</label>
-                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white">
                       <option>English</option>
                       <option>Spanish</option>
                       <option>French</option>
@@ -197,7 +197,7 @@ export default function Settings() {
                 <div className="space-y-2">
                   {users.map((user) => (
                     <div key={user.id} className="flex items-center gap-3 p-4 border border-gray-100 rounded-xl hover:bg-gray-50 transition-colors">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center flex-shrink-0">
                         <span className="text-white text-sm font-600">{user.avatar}</span>
                       </div>
                       <div className="flex-1 min-w-0">
@@ -208,7 +208,7 @@ export default function Settings() {
                         <p className="text-xs font-600 text-gray-700">{user.role}</p>
                         <p className="text-xs text-gray-400">{user.productsReviewed} reviews · {user.approvalRate}</p>
                       </div>
-                      <span className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0" />
+                      <span className="w-2 h-2 bg-teal-400 rounded-full flex-shrink-0" />
                       <div className="flex gap-1 flex-shrink-0">
                         <button className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
                           <FiEdit2 className="w-3.5 h-3.5" />
@@ -229,8 +229,8 @@ export default function Settings() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {[
                     { name: 'Amazon Seller Central', enabled: true, desc: 'Sync products from Amazon marketplace', color: 'bg-orange-100' },
-                    { name: 'Shopify', enabled: true, desc: 'Import and publish to Shopify store', color: 'bg-green-100' },
-                    { name: 'Walmart Marketplace', enabled: false, desc: 'Connect to Walmart seller account', color: 'bg-blue-100' },
+                    { name: 'Shopify', enabled: true, desc: 'Import and publish to Shopify store', color: 'bg-teal-100' },
+                    { name: 'Walmart Marketplace', enabled: false, desc: 'Connect to Walmart seller account', color: 'bg-teal-100' },
                     { name: 'eBay', enabled: false, desc: 'List products on eBay marketplace', color: 'bg-yellow-100' },
                     { name: 'Slack', enabled: false, desc: 'Send compliance alerts to Slack', color: 'bg-purple-100' },
                     { name: 'Zapier', enabled: false, desc: 'Automate workflows with 5000+ apps', color: 'bg-red-100' }

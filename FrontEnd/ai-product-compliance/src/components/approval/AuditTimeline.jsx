@@ -2,9 +2,9 @@ import { motion } from 'framer-motion';
 import { formatDateTime } from '../../utils/helpers';
 
 const actionColors = {
-  'Approved': 'bg-green-100 text-green-700 border-green-200',
+  'Approved': 'bg-teal-100 text-teal-800 border-teal-200',
   'Rejected': 'bg-red-100 text-red-700 border-red-200',
-  'Published': 'bg-blue-100 text-blue-700 border-blue-200',
+  'Published': 'bg-teal-100 text-teal-800 border-teal-200',
   'Analyzed': 'bg-purple-100 text-purple-700 border-purple-200',
   'Flagged': 'bg-orange-100 text-orange-700 border-orange-200',
   'Requested Changes': 'bg-yellow-100 text-yellow-700 border-yellow-200'
@@ -12,8 +12,8 @@ const actionColors = {
 
 const avatarColors = {
   'AI': 'from-purple-500 to-purple-700',
-  'SJ': 'from-blue-500 to-blue-700',
-  'MC': 'from-green-500 to-green-700',
+  'SJ': 'from-teal-600 to-teal-800',
+  'MC': 'from-teal-600 to-teal-800',
   'ER': 'from-pink-500 to-pink-700',
   'DK': 'from-orange-500 to-orange-700',
   'JW': 'from-cyan-500 to-cyan-700'
@@ -49,7 +49,7 @@ export default function AuditTimeline({ logs = [] }) {
               </span>
               <span className="text-xs text-gray-400">{formatDateTime(log.timestamp)}</span>
             </div>
-            <p className="text-xs text-blue-600 font-500 mb-1">{log.product} ({log.productId})</p>
+            <p className="text-xs text-teal-700 font-500 mb-1">{log.product} ({log.productId})</p>
             <p className="text-xs text-gray-600 leading-relaxed">{log.details}</p>
           </div>
         </motion.div>

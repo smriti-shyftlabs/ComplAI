@@ -16,7 +16,7 @@ export default function ApprovalHistory() {
   const filtered = filter === 'all' ? auditLogs.filter(l => decisions.includes(l.action)) : auditLogs.filter(l => l.action === filter);
 
   const actionColors = {
-    'Approved': 'text-green-700 bg-green-50 border-green-200',
+    'Approved': 'text-teal-800 bg-teal-50 border-teal-200',
     'Rejected': 'text-red-700 bg-red-50 border-red-200',
     'Requested Changes': 'text-yellow-700 bg-yellow-50 border-yellow-200'
   };
@@ -29,7 +29,7 @@ export default function ApprovalHistory() {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`text-xs px-3 py-1.5 rounded-full border font-500 transition-all ${filter === f ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600 border-gray-200 hover:border-gray-300'}`}
+            className={`text-xs px-3 py-1.5 rounded-full border font-500 transition-all ${filter === f ? 'bg-teal-700 text-white border-teal-700' : 'text-gray-600 border-gray-200 hover:border-gray-300'}`}
           >
             {f === 'all' ? 'All Decisions' : f}
           </button>
@@ -57,7 +57,7 @@ export default function ApprovalHistory() {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-blue-600 font-500">{log.product}</p>
+              <p className="text-xs text-teal-700 font-500">{log.product}</p>
               {log.details && <p className="text-xs text-gray-500 mt-1">{log.details}</p>}
               <p className="text-xs text-gray-400 mt-1">{formatDateTime(log.timestamp)}</p>
             </div>

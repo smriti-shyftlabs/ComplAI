@@ -27,8 +27,8 @@ export default function ComplianceChart({ data = [] }) {
         <AreaChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
           <defs>
             <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.15} />
-              <stop offset="95%" stopColor="#3B82F6" stopOpacity={0.02} />
+              <stop offset="5%" stopColor="#2BA090" stopOpacity={0.15} />
+              <stop offset="95%" stopColor="#2BA090" stopOpacity={0.02} />
             </linearGradient>
             <linearGradient id="approvedGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#10B981" stopOpacity={0.12} />
@@ -53,10 +53,10 @@ export default function ComplianceChart({ data = [] }) {
             type="monotone"
             dataKey="score"
             name="Compliance Score"
-            stroke="#3B82F6"
+            stroke="#2BA090"
             strokeWidth={2.5}
             fill="url(#scoreGradient)"
-            dot={{ fill: '#3B82F6', r: 3, strokeWidth: 0 }}
+            dot={{ fill: '#2BA090', r: 3, strokeWidth: 0 }}
             activeDot={{ r: 5, strokeWidth: 0 }}
           />
           <Area

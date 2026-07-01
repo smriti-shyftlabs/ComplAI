@@ -6,8 +6,8 @@ export default function RuleViolationCard({ violation, index = 0 }) {
   if (!violation) return null;
   const { rule, severity, description, fix, suggestion } = violation;
 
-  const borderColor = severity === 'critical' ? 'border-red-300' : severity === 'high' ? 'border-orange-300' : severity === 'medium' ? 'border-yellow-300' : 'border-blue-200';
-  const headerBg = severity === 'critical' ? 'bg-red-50' : severity === 'high' ? 'bg-orange-50' : severity === 'medium' ? 'bg-yellow-50' : 'bg-blue-50';
+  const borderColor = severity === 'critical' ? 'border-red-300' : severity === 'high' ? 'border-orange-300' : severity === 'medium' ? 'border-yellow-300' : 'border-teal-200';
+  const headerBg = severity === 'critical' ? 'bg-red-50' : severity === 'high' ? 'bg-orange-50' : severity === 'medium' ? 'bg-yellow-50' : 'bg-teal-50';
 
   return (
     <motion.div
@@ -40,12 +40,12 @@ export default function RuleViolationCard({ violation, index = 0 }) {
           </div>
         )}
         {suggestion && (
-          <div className="bg-blue-50 rounded-lg p-3">
+          <div className="bg-teal-50 rounded-lg p-3">
             <div className="flex items-center gap-1.5 mb-1.5">
-              <FiZap className="w-3.5 h-3.5 text-blue-500" />
-              <p className="text-xs font-600 text-blue-600 uppercase tracking-wider">AI Suggestion</p>
+              <FiZap className="w-3.5 h-3.5 text-teal-600" />
+              <p className="text-xs font-600 text-teal-700 uppercase tracking-wider">AI Suggestion</p>
             </div>
-            <p className="text-sm text-blue-700">{suggestion}</p>
+            <p className="text-sm text-teal-800">{suggestion}</p>
           </div>
         )}
       </div>

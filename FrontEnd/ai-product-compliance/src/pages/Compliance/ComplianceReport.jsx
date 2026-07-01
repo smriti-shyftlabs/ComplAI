@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft, FiCheck, FiX, FiEdit, FiDownload } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiEdit, FiDownload, FiGlobe } from 'react-icons/fi';
 import ComplianceScore from '../../components/compliance/ComplianceScore';
 import ComplianceChecklist from '../../components/compliance/ComplianceChecklist';
 import AISuggestions from '../../components/compliance/AISuggestions';
@@ -11,6 +11,7 @@ import Button from '../../components/common/Button';
 import { getProducts } from '../../services/productService';
 import { analyzeProduct } from '../../services/aiService';
 import { approveProduct, rejectProduct, requestChanges } from '../../services/approvalService';
+import { publishProduct } from '../../services/productService';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 
 const DECISION_CONFIG = {
@@ -27,6 +28,7 @@ export default function ComplianceReport() {
   const [loading, setLoading] = useState(true);
   const [decision, setDecision] = useState(null);
   const [submitting, setSubmitting] = useState(null);
+  const [publishing, setPublishing] = useState(false);
 
   const handleDecision = async (type) => {
     if (!product?.id || submitting) return;
@@ -40,6 +42,20 @@ export default function ComplianceReport() {
       console.error('Decision failed:', err);
     } finally {
       setSubmitting(null);
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!product?.id || publishing) return;
+    setPublishing(true);
+    try {
+      await publishProduct(product.id);
+      setProduct(prev => ({ ...prev, status: 'published' }));
+      setDecision({ type: 'published', message: 'Product published to marketplace.' });
+    } catch (err) {
+      console.error('Publish failed:', err);
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -66,7 +82,7 @@ export default function ComplianceReport() {
     return (
       <div className="flex items-center justify-center min-h-64">
         <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+          <svg className="animate-spin w-8 h-8 text-teal-700" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
@@ -110,7 +126,7 @@ export default function ComplianceReport() {
             <div className="w-full mt-6 space-y-2 text-sm">
               {[
                 { label: 'Rules Checked', value: report?.rulesChecked || 20 },
-                { label: 'Rules Passed', value: report?.rulesPassed, color: 'text-green-600' },
+                { label: 'Rules Passed', value: report?.rulesPassed, color: 'text-teal-700' },
                 { label: 'Rules Failed', value: report?.rulesFailed, color: 'text-red-600' },
                 { label: 'AI Confidence', value: `${report?.confidence || 94}%` }
               ].map(item => (
@@ -153,13 +169,31 @@ export default function ComplianceReport() {
             <h3 className="text-sm font-600 text-gray-900">Review Decision</h3>
             {decision ? (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-100 rounded-lg">
-                  <FiCheck className="w-4 h-4 text-green-600 flex-shrink-0" />
-                  <p className="text-sm font-500 text-green-800">{decision.message}</p>
+                <div className="flex items-center gap-2 p-3 bg-teal-50 border border-teal-100 rounded-lg">
+                  <FiCheck className="w-4 h-4 text-teal-700 flex-shrink-0" />
+                  <p className="text-sm font-500 text-teal-900">{decision.message}</p>
                 </div>
-                <Button variant="secondary" fullWidth onClick={() => navigate('/approval')}>
-                  Go to Approval Queue
-                </Button>
+                {decision.type === 'approve' && (
+                  <Button
+                    variant="success"
+                    fullWidth
+                    icon={FiGlobe}
+                    loading={publishing}
+                    disabled={publishing}
+                    onClick={handlePublish}
+                  >
+                    Publish to Marketplace
+                  </Button>
+                )}
+                {decision.type === 'published' ? (
+                  <Button variant="secondary" fullWidth onClick={() => navigate('/published')}>
+                    View Published Products
+                  </Button>
+                ) : (
+                  <Button variant="secondary" fullWidth onClick={() => navigate('/approval')}>
+                    Go to Approval Queue
+                  </Button>
+                )}
               </div>
             ) : (
               <>

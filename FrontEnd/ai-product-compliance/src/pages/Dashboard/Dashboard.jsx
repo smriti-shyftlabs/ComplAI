@@ -19,8 +19,8 @@ const alertIconMap = { FiAlertTriangle, FiAlertCircle, FiInfo, FiCheckCircle };
 const alertTypeStyles = {
   critical: 'bg-red-50 border-l-red-500 text-red-700',
   warning: 'bg-yellow-50 border-l-yellow-500 text-yellow-700',
-  info: 'bg-blue-50 border-l-blue-500 text-blue-700',
-  success: 'bg-green-50 border-l-green-500 text-green-700'
+  info: 'bg-teal-50 border-l-teal-600 text-teal-800',
+  success: 'bg-teal-50 border-l-teal-600 text-teal-800'
 };
 
 export default function Dashboard() {
@@ -96,7 +96,7 @@ export default function Dashboard() {
           subtitle="12-month compliance score & approval data"
           className="lg:col-span-2"
           actions={
-            <button onClick={() => navigate('/analytics')} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+            <button onClick={() => navigate('/analytics')} className="text-xs text-teal-700 hover:underline flex items-center gap-1">
               View Analytics <FiArrowRight className="w-3 h-3" />
             </button>
           }
@@ -140,7 +140,7 @@ export default function Dashboard() {
           subtitle="Latest product submissions"
           className="lg:col-span-2"
           actions={
-            <button onClick={() => navigate('/published')} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+            <button onClick={() => navigate('/published')} className="text-xs text-teal-700 hover:underline flex items-center gap-1">
               View all <FiArrowRight className="w-3 h-3" />
             </button>
           }
@@ -161,7 +161,7 @@ export default function Dashboard() {
         title="Recent Alerts"
         subtitle="Compliance notifications requiring attention"
         actions={
-          <span className="text-xs text-blue-600 cursor-pointer hover:underline">Mark all read</span>
+          <span className="text-xs text-teal-700 cursor-pointer hover:underline">Mark all read</span>
         }
       >
         <div className="space-y-2">

@@ -38,7 +38,7 @@ export default function UploadBox({
 
   const getIcon = (type) => {
     if (type?.includes('pdf')) return <FiFileText className="w-4 h-4 text-red-500" />;
-    if (type?.includes('image')) return <FiFile className="w-4 h-4 text-blue-500" />;
+    if (type?.includes('image')) return <FiFile className="w-4 h-4 text-teal-600" />;
     return <FiFile className="w-4 h-4 text-gray-500" />;
   };
 
@@ -52,30 +52,30 @@ export default function UploadBox({
         onDrop={(e) => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files); }}
         onClick={() => inputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-xl p-6 flex flex-col items-center gap-3 cursor-pointer transition-all
-          ${dragging ? 'border-blue-500 bg-blue-50 scale-[1.01]' : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50 bg-white'}
+          ${dragging ? 'border-teal-600 bg-teal-50 scale-[1.01]' : 'border-gray-300 hover:border-teal-400 hover:bg-gray-50 bg-white'}
         `}
       >
         {uploading ? (
           <div className="flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-              <svg className="animate-spin w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24">
+            <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
+              <svg className="animate-spin w-6 h-6 text-teal-700" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
             </div>
-            <p className="text-sm text-blue-600 font-500">Uploading files...</p>
+            <p className="text-sm text-teal-700 font-500">Uploading files...</p>
           </div>
         ) : (
           <>
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${dragging ? 'bg-blue-100' : 'bg-gray-100'}`}>
-              <FiUploadCloud className={`w-6 h-6 transition-colors ${dragging ? 'text-blue-600' : 'text-gray-400'}`} />
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${dragging ? 'bg-teal-100' : 'bg-gray-100'}`}>
+              <FiUploadCloud className={`w-6 h-6 transition-colors ${dragging ? 'text-teal-700' : 'text-gray-400'}`} />
             </div>
             <div className="text-center">
               <p className="text-sm font-500 text-gray-700">{helperText}</p>
               <p className="text-xs text-gray-400 mt-1">Supports: {accept.replace(/\./g, '').replace(/,/g, ', ').toUpperCase()}</p>
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" className="text-xs text-blue-600 font-600 hover:underline bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
+              <button type="button" className="text-xs text-teal-700 font-600 hover:underline bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-200">
                 Browse Files
               </button>
             </div>
@@ -108,7 +108,7 @@ export default function UploadBox({
                   <p className="text-xs font-500 text-gray-700 truncate">{file.name}</p>
                   {file.size && <p className="text-xs text-gray-400">{formatSize(file.size)}</p>}
                 </div>
-                <FiCheck className="w-4 h-4 text-green-500 flex-shrink-0" />
+                <FiCheck className="w-4 h-4 text-teal-600 flex-shrink-0" />
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); removeFile(i); }}

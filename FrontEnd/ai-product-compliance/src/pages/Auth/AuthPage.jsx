@@ -22,11 +22,11 @@ const stats = [
 function Wordmark({ className = '', textClass = 'text-white' }) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-blue-600 flex items-center justify-center shadow-lg shadow-violet-900/40 ring-1 ring-white/20">
+      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-violet-500 to-teal-700 flex items-center justify-center shadow-lg shadow-violet-900/40 ring-1 ring-white/20">
         <FiShield className="w-5 h-5 text-white" />
       </div>
       <span className={`text-2xl font-bold tracking-tight ${textClass}`}>
-        Compl<span className="bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">AI</span>
+        Compl<span className="bg-gradient-to-r from-violet-400 to-teal-400 bg-clip-text text-transparent">AI</span>
       </span>
     </div>
   );
@@ -45,7 +45,7 @@ export default function AuthPage() {
           {/* glow orb */}
           <div className="absolute top-[36%] right-[-11rem] w-[26rem] h-[26rem] rounded-full"
                style={{ background: 'radial-gradient(circle at 30% 32%, #7e93f5 0%, #5360e0 30%, #4a32b8 50%, rgba(40,30,110,0) 70%)', opacity: 0.8 }} />
-          <div className="absolute top-[30%] right-[-14rem] w-[32rem] h-[32rem] rounded-full bg-blue-500/15 blur-3xl" />
+          <div className="absolute top-[30%] right-[-14rem] w-[32rem] h-[32rem] rounded-full bg-teal-600/15 blur-3xl" />
           <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-violet-600/30 blur-3xl" />
           {/* grid */}
           <svg className="absolute inset-0 w-full h-full opacity-[0.10]" xmlns="http://www.w3.org/2000/svg">
@@ -75,13 +75,13 @@ export default function AuthPage() {
 
           <div className="space-y-9 py-8">
             <div>
-              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 ring-1 ring-white/15 text-sm font-medium text-blue-50 backdrop-blur">
+              <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 ring-1 ring-white/15 text-sm font-medium text-teal-50 backdrop-blur">
                 <HiSparkles className="w-4 h-4 text-violet-300" />
                 Enterprise Catalog Governance
               </span>
               <h1 className="mt-7 text-5xl font-bold leading-[1.08] tracking-tight text-white">
                 AI-Powered<br />Product Compliance<br />
-                <span className="bg-gradient-to-r from-blue-400 via-indigo-300 to-violet-400 bg-clip-text text-transparent">Platform</span>
+                <span className="bg-gradient-to-r from-teal-400 via-indigo-300 to-violet-400 bg-clip-text text-transparent">Platform</span>
               </h1>
               <p className="mt-5 text-base text-slate-300/90 leading-relaxed max-w-md">
                 Review, analyze, and approve products before publication — with AI that catches what humans miss.

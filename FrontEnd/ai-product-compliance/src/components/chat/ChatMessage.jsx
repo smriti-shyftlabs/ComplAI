@@ -37,7 +37,7 @@ export default function ChatMessage({ message }) {
       className={`flex gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}
     >
       {/* Avatar */}
-      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isUser ? 'bg-blue-600' : 'bg-gradient-to-br from-purple-500 to-blue-600'}`}>
+      <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isUser ? 'bg-teal-700' : 'bg-gradient-to-br from-purple-500 to-teal-700'}`}>
         {isUser ? (
           <span className="text-white text-xs font-600">A</span>
         ) : (
@@ -50,7 +50,7 @@ export default function ChatMessage({ message }) {
         <div
           className={`px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap break-words ${
             isUser
-              ? 'bg-blue-600 text-white rounded-tr-sm'
+              ? 'bg-teal-700 text-white rounded-tr-sm'
               : 'bg-gray-100 text-gray-800 rounded-tl-sm'
           }`}
         >

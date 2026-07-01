@@ -41,8 +41,8 @@ export default function AuditTrail() {
       {/* Stats Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: 'Total Actions', value: auditLogs.length, color: 'text-blue-600 bg-blue-50' },
-          { label: 'Approved', value: auditLogs.filter(l => l.action === 'Approved').length, color: 'text-green-600 bg-green-50' },
+          { label: 'Total Actions', value: auditLogs.length, color: 'text-teal-700 bg-teal-50' },
+          { label: 'Approved', value: auditLogs.filter(l => l.action === 'Approved').length, color: 'text-teal-700 bg-teal-50' },
           { label: 'Rejected', value: auditLogs.filter(l => l.action === 'Rejected').length, color: 'text-red-600 bg-red-50' },
           { label: 'AI Actions', value: auditLogs.filter(l => l.user === 'AI System').length, color: 'text-purple-600 bg-purple-50' }
         ].map(stat => (
@@ -62,20 +62,20 @@ export default function AuditTrail() {
             placeholder="Search logs..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
           />
         </div>
         <select
           value={actionFilter}
           onChange={e => setActionFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
         >
           {actions.map(a => <option key={a} value={a}>{a === 'all' ? 'All Actions' : a}</option>)}
         </select>
         <select
           value={userFilter}
           onChange={e => setUserFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
         >
           {users.map(u => <option key={u} value={u}>{u === 'all' ? 'All Users' : u}</option>)}
         </select>

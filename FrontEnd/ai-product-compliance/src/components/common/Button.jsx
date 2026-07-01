@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 
 const variantStyles = {
-  primary: 'bg-blue-600 hover:bg-blue-700 text-white border-transparent shadow-sm hover:shadow-md',
-  secondary: 'bg-white hover:bg-gray-50 text-gray-700 border-gray-300 shadow-sm',
+  primary: 'text-white border-transparent shadow-sm hover:shadow-md hover:opacity-90',
+  secondary: 'bg-white hover:bg-teal-50 border-teal-300 shadow-sm',
   danger: 'bg-red-600 hover:bg-red-700 text-white border-transparent shadow-sm hover:shadow-md',
-  ghost: 'bg-transparent hover:bg-gray-100 text-gray-600 border-transparent',
-  outline: 'bg-transparent hover:bg-blue-50 text-blue-600 border-blue-300 hover:border-blue-400',
-  success: 'bg-emerald-600 hover:bg-emerald-700 text-white border-transparent shadow-sm',
+  ghost: 'bg-transparent hover:bg-teal-100 border-transparent',
+  outline: 'bg-transparent hover:opacity-80 border',
+  success: 'text-white border-transparent shadow-sm hover:opacity-90',
   warning: 'bg-yellow-500 hover:bg-yellow-600 text-white border-transparent shadow-sm'
 };
 
@@ -41,13 +41,24 @@ export default function Button({
       whileTap={{ scale: isDisabled ? 1 : 0.97 }}
       className={`
         inline-flex items-center justify-center font-500 border rounded-lg transition-all duration-150
-        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
+        focus:outline-none focus:ring-2 focus:ring-offset-1
         disabled:opacity-50 disabled:cursor-not-allowed
         ${variantStyles[variant] || variantStyles.primary}
         ${sizeStyles[size] || sizeStyles.md}
         ${fullWidth ? 'w-full' : ''}
         ${className}
       `}
+      style={
+        variant === 'primary' || variant === 'success'
+          ? { background: '#155E56', color: '#F0FAF8' }
+          : variant === 'outline'
+          ? { color: '#2BA090', borderColor: '#7EC8BE' }
+          : variant === 'ghost'
+          ? { color: '#2BA090' }
+          : variant === 'secondary'
+          ? { color: '#0C3530', borderColor: '#BDD8D3' }
+          : {}
+      }
       {...props}
     >
       {loading ? (

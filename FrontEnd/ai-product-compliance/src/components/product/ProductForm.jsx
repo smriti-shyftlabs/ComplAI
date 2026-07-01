@@ -23,7 +23,7 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
       {/* ── Common fields (always visible) ── */}
       <div>
         <h3 className="text-sm font-600 text-gray-900 mb-4 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-700">1</span>
+          <span className="w-6 h-6 rounded-full bg-teal-700 text-white flex items-center justify-center text-xs font-700">1</span>
           Basic Information
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -54,7 +54,7 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
             onChange={e => onChange('description', e.target.value)}
             rows={4}
             className={`w-full px-3 py-2.5 border rounded-lg text-sm text-gray-900 placeholder-gray-400 resize-none transition-all
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+              focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent
               ${errors.description ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'}`}
           />
           <div className="flex justify-between mt-1">
@@ -69,7 +69,7 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
       {/* ── Images (common, required) ── */}
       <div>
         <h3 className="text-sm font-600 text-gray-900 mb-4 flex items-center gap-2">
-          <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-700">2</span>
+          <span className="w-6 h-6 rounded-full bg-teal-700 text-white flex items-center justify-center text-xs font-700">2</span>
           Product Images <span className="text-red-500">*</span>
         </h3>
         <ImageUploader images={values.images || []} onChange={v => onChange('images', v)} maxImages={10} />
@@ -96,7 +96,7 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
             {schema.sections.map((section, si) => (
               <div key={section.id}>
                 <h3 className="text-sm font-600 text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-700">{si + 3}</span>
+                  <span className="w-6 h-6 rounded-full bg-teal-700 text-white flex items-center justify-center text-xs font-700">{si + 3}</span>
                   {section.title}
                   <span className="text-xs font-400 text-gray-400">· {schema.label}</span>
                 </h3>

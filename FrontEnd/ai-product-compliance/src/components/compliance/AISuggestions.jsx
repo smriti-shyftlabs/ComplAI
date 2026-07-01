@@ -4,7 +4,7 @@ import { FiZap, FiArrowRight, FiAlertCircle, FiInfo } from 'react-icons/fi';
 const priorityConfig = {
   high: { color: 'text-red-600 bg-red-50 border-red-100', icon: FiAlertCircle },
   medium: { color: 'text-yellow-600 bg-yellow-50 border-yellow-100', icon: FiInfo },
-  low: { color: 'text-blue-600 bg-blue-50 border-blue-100', icon: FiZap }
+  low: { color: 'text-teal-700 bg-teal-50 border-teal-100', icon: FiZap }
 };
 
 const defaultSuggestions = [
@@ -19,12 +19,12 @@ export default function AISuggestions({ suggestions = defaultSuggestions, recomm
   return (
     <div>
       {recommendation && (
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+        <div className="mb-4 p-4 bg-teal-50 border border-teal-100 rounded-xl">
           <div className="flex items-start gap-2">
-            <FiZap className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+            <FiZap className="w-4 h-4 text-teal-700 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="text-sm font-600 text-blue-900 mb-1">AI Recommendation</p>
-              <p className="text-sm text-blue-700">{recommendation}</p>
+              <p className="text-sm font-600 text-teal-900 mb-1">AI Recommendation</p>
+              <p className="text-sm text-teal-800">{recommendation}</p>
             </div>
           </div>
         </div>
