@@ -55,17 +55,6 @@ export const useProducts = () => {
     }
   }, []);
 
-  const publishProduct = useCallback(async (id) => {
-    try {
-      const published = await productService.publishProduct(id);
-      setProducts(prev => prev.map(p => p.id === id ? published : p));
-      return published;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  }, []);
-
   const getProductById = useCallback(async (id) => {
     try {
       return await productService.getProductById(id);
@@ -83,7 +72,6 @@ export const useProducts = () => {
     addProduct,
     updateProduct,
     deleteProduct,
-    publishProduct,
     getProductById
   };
 };

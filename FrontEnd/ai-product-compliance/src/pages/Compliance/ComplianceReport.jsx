@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft, FiCheck, FiX, FiEdit, FiDownload, FiGlobe } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiEdit, FiDownload } from 'react-icons/fi';
 import ComplianceScore from '../../components/compliance/ComplianceScore';
 import ComplianceChecklist from '../../components/compliance/ComplianceChecklist';
 import AISuggestions from '../../components/compliance/AISuggestions';
@@ -11,7 +11,6 @@ import Button from '../../components/common/Button';
 import { getProducts } from '../../services/productService';
 import { analyzeProduct } from '../../services/aiService';
 import { approveProduct, rejectProduct, requestChanges } from '../../services/approvalService';
-import { publishProduct } from '../../services/productService';
 import { formatCurrency, formatDate } from '../../utils/helpers';
 
 const DECISION_CONFIG = {
@@ -28,7 +27,6 @@ export default function ComplianceReport() {
   const [loading, setLoading] = useState(true);
   const [decision, setDecision] = useState(null);
   const [submitting, setSubmitting] = useState(null);
-  const [publishing, setPublishing] = useState(false);
 
   const handleDecision = async (type) => {
     if (!product?.id || submitting) return;
@@ -42,20 +40,6 @@ export default function ComplianceReport() {
       console.error('Decision failed:', err);
     } finally {
       setSubmitting(null);
-    }
-  };
-
-  const handlePublish = async () => {
-    if (!product?.id || publishing) return;
-    setPublishing(true);
-    try {
-      await publishProduct(product.id);
-      setProduct(prev => ({ ...prev, status: 'published' }));
-      setDecision({ type: 'published', message: 'Product published to marketplace.' });
-    } catch (err) {
-      console.error('Publish failed:', err);
-    } finally {
-      setPublishing(false);
     }
   };
 
@@ -173,27 +157,9 @@ export default function ComplianceReport() {
                   <FiCheck className="w-4 h-4 text-green-600 flex-shrink-0" />
                   <p className="text-sm font-500 text-green-800">{decision.message}</p>
                 </div>
-                {decision.type === 'approve' && (
-                  <Button
-                    variant="success"
-                    fullWidth
-                    icon={FiGlobe}
-                    loading={publishing}
-                    disabled={publishing}
-                    onClick={handlePublish}
-                  >
-                    Publish to Marketplace
-                  </Button>
-                )}
-                {decision.type === 'published' ? (
-                  <Button variant="secondary" fullWidth onClick={() => navigate('/published')}>
-                    View Published Products
-                  </Button>
-                ) : (
-                  <Button variant="secondary" fullWidth onClick={() => navigate('/approval')}>
-                    Go to Approval Queue
-                  </Button>
-                )}
+                <Button variant="secondary" fullWidth onClick={() => navigate('/approval')}>
+                  Go to Approval Queue
+                </Button>
               </div>
             ) : (
               <>
