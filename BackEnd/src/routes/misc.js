@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { Settings, Products, Reports, Rules, Notifications } from '../seed.js';
+import { Settings, Products, Reports, Rules, Notifications, Emails } from '../seed.js';
+import { mailEnabled, mailMode } from '../mailer.js';
 import {
   complianceTrendData,
   recentAlerts,
@@ -21,6 +22,9 @@ router.patch('/settings/:id', (req, res) => {
 
 // ── compliance rules ──────────────────────────────────────────────────────
 router.get('/rules', (_req, res) => res.json(Rules().findAll()));
+
+// ── email notification log ───────────────────────────────────────────────────
+router.get('/emails', (_req, res) => res.json({ mailEnabled, mailMode, log: Emails().sort('sentAt', 'desc') }));
 
 // ── notifications ───────────────────────────────────────────────────────────
 router.get('/notifications', (_req, res) =>

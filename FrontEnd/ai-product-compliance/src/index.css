@@ -37,3 +37,9 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #2BA090;
 }
+
+/* Dark mode body */
+html.dark body {
+  background: #0D1F1D;
+  color: #DDF0ED;
+}

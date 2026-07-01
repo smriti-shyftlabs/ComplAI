@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft, FiCheck, FiX, FiDownload, FiGlobe, FiEdit2 } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiDownload, FiGlobe, FiEdit2, FiChevronRight } from 'react-icons/fi';
 import ComplianceScore from '../../components/compliance/ComplianceScore';
 import ComplianceChecklist from '../../components/compliance/ComplianceChecklist';
 import AISuggestions from '../../components/compliance/AISuggestions';
@@ -19,15 +19,64 @@ const DECISION_CONFIG = {
   reject: { status: 'rejected', run: rejectProduct, message: 'Product rejected.' },
 };
 
+const scoreColor = (s) =>
+  s >= 90 ? 'bg-teal-100 text-teal-800'
+  : s >= 75 ? 'bg-blue-100 text-blue-700'
+  : s >= 50 ? 'bg-yellow-100 text-yellow-700'
+  : 'bg-red-100 text-red-700';
+
+function Spinner({ label }) {
+  return (
+    <div className="flex flex-col items-center gap-3">
+      <svg className="animate-spin w-8 h-8 text-teal-700" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+      </svg>
+      <p className="text-sm text-gray-500">{label}</p>
+    </div>
+  );
+}
+
 export default function ComplianceReport() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [products, setProducts] = useState([]);
+  const [listLoading, setListLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [report, setReport] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [reportLoading, setReportLoading] = useState(false);
   const [decision, setDecision] = useState(null);
   const [submitting, setSubmitting] = useState(null);
   const [publishing, setPublishing] = useState(false);
+
+  useEffect(() => {
+    const init = async () => {
+      // Deep-linked from elsewhere with a product + its result
+      if (location.state?.product && location.state?.complianceResult) {
+        setProduct(location.state.product);
+        setReport(location.state.complianceResult);
+      }
+      try { setProducts(await getProducts()); } catch { setProducts([]); }
+      setListLoading(false);
+    };
+    init();
+  }, [location.state]);
+
+  const openReport = async (p) => {
+    setProduct(p);
+    setReport(null);
+    setDecision(null);
+    setReportLoading(true);
+    try { setReport(await analyzeProduct(p)); } catch { /* ignore */ }
+    setReportLoading(false);
+  };
+
+  const backToList = async () => {
+    setProduct(null);
+    setReport(null);
+    setDecision(null);
+    try { setProducts(await getProducts()); } catch { /* keep existing */ }
+  };
 
   const handleDecision = async (type) => {
     if (!product?.id || submitting) return;
@@ -58,52 +107,79 @@ export default function ComplianceReport() {
     }
   };
 
-  useEffect(() => {
-    const init = async () => {
-      if (location.state?.product && location.state?.complianceResult) {
-        setProduct(location.state.product);
-        setReport(location.state.complianceResult);
-        setLoading(false);
-        return;
-      }
-      const all = await getProducts();
-      const p = all.find(x => x.status === 'pending') || all[0];
-      if (!p) { setLoading(false); return; }
-      setProduct(p);
-      const result = await analyzeProduct(p);
-      setReport(result);
-      setLoading(false);
-    };
-    init();
-  }, [location.state]);
-
-  if (loading) {
+  // ── List view ───────────────────────────────────────────────────────────
+  if (!product) {
     return (
-      <div className="flex items-center justify-center min-h-64">
-        <div className="flex flex-col items-center gap-3">
-          <svg className="animate-spin w-8 h-8 text-teal-700" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-          <p className="text-sm text-gray-500">Loading compliance report...</p>
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-2xl font-700 text-gray-900">Compliance Reports</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Select a product to view its detailed compliance report</p>
         </div>
+
+        {listLoading ? (
+          <div className="flex justify-center py-16"><Spinner label="Loading products…" /></div>
+        ) : products.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-sm text-gray-400">
+            No products yet. Add one to generate a compliance report.
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-100 overflow-hidden">
+            {products.map((p, i) => (
+              <motion.button
+                key={p.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.03, 0.3) }}
+                onClick={() => openReport(p)}
+                className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors text-left"
+              >
+                <span className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${scoreColor(p.complianceScore)}`}>
+                  <span className="text-sm font-700 leading-none">{p.complianceScore}</span>
+                  <span className="text-[9px] opacity-70">/100</span>
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-600 text-gray-900 truncate">{p.name}</p>
+                  <p className="text-xs text-gray-500">{p.brand} · {p.category}</p>
+                </div>
+                <div className="hidden sm:flex items-center gap-2">
+                  <StatusBadge status={p.status} />
+                  <RiskBadge risk={p.riskLevel} />
+                </div>
+                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+              </motion.button>
+            ))}
+          </div>
+        )}
       </div>
     );
   }
 
+  // ── Loading a selected report ─────────────────────────────────────────────
+  if (reportLoading || !report) {
+    return (
+      <div className="max-w-6xl mx-auto space-y-6">
+        <button onClick={backToList} className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700">
+          <FiArrowLeft className="w-4 h-4" /> Back to reports
+        </button>
+        <div className="flex justify-center py-16"><Spinner label="Analyzing product…" /></div>
+      </div>
+    );
+  }
+
+  // ── Detailed report view ──────────────────────────────────────────────────
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-sm text-gray-500">
-        <button onClick={() => navigate('/')} className="hover:text-gray-700">Dashboard</button>
+        <button onClick={backToList} className="hover:text-gray-700">Compliance Reports</button>
         <span>/</span>
-        <span className="text-gray-900 font-500">Compliance Report</span>
+        <span className="text-gray-900 font-500">{product?.name}</span>
       </div>
 
       {/* Header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <Button variant="ghost" size="sm" icon={FiArrowLeft} onClick={() => navigate(-1)} />
+          <Button variant="ghost" size="sm" icon={FiArrowLeft} onClick={backToList} />
           <div>
             <h1 className="text-2xl font-700 text-gray-900">Compliance Report</h1>
             <p className="text-sm text-gray-500">{product?.name}</p>

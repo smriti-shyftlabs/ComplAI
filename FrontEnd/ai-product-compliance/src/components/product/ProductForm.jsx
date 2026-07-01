@@ -6,17 +6,38 @@
  * is chosen. State lives in the parent (AddProduct) so the readiness meter can
  * update in real time and values survive across the analyze/publish phases.
  */
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiDollarSign, FiHash } from 'react-icons/fi';
+import { FiDollarSign, FiHash, FiMail } from 'react-icons/fi';
+import { HiSparkles } from 'react-icons/hi2';
 import Input from '../common/Input';
 import CategorySelector from './CategorySelector';
 import ImageUploader from './ImageUploader';
 import DynamicField from './DynamicField';
 import { getCategorySchema } from '../../data/categorySchemas';
+import { refineDescription } from '../../services/aiService';
 
 export default function ProductForm({ values, errors = {}, onChange, disabled = false }) {
   const schema = getCategorySchema(values.category);
   const description = values.description || '';
+  const [refining, setRefining] = useState(false);
+  const canRefine = Boolean((values.name || '').trim());
+
+  const handleRefine = async () => {
+    if (refining || !canRefine) return;
+    setRefining(true);
+    try {
+      const text = await refineDescription({
+        name: values.name, brand: values.brand, category: values.category,
+        productType: values.productType, price: values.price, description,
+      });
+      if (text) onChange('description', text);
+    } catch (err) {
+      console.error('Refine failed:', err);
+    } finally {
+      setRefining(false);
+    }
+  };
 
   return (
     <fieldset disabled={disabled} className="space-y-8">
@@ -31,6 +52,9 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
             value={values.name || ''} onChange={e => onChange('name', e.target.value)} error={errors.name} />
           <Input label="Brand" required placeholder="e.g. ZenTech"
             value={values.brand || ''} onChange={e => onChange('brand', e.target.value)} error={errors.brand} />
+          <Input label="Vendor Email" required type="email" placeholder="vendor@company.com" icon={FiMail}
+            value={values.vendorEmail || ''} onChange={e => onChange('vendorEmail', e.target.value)}
+            error={errors.vendorEmail} />
           <Input label="SKU ID" placeholder="e.g. SKU-1001" icon={FiHash}
             value={values.sku || ''} onChange={e => onChange('sku', e.target.value)} />
           <Input label="Price ($)" required type="number" placeholder="0.00" icon={FiDollarSign} min="0" step="0.01"
@@ -45,9 +69,28 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-500 text-gray-700 mb-1.5">
-            Description <span className="text-red-500">*</span>
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-sm font-500 text-gray-700">
+              Description <span className="text-red-500">*</span>
+            </label>
+            <button
+              type="button"
+              onClick={handleRefine}
+              disabled={refining || !canRefine}
+              title={!canRefine ? 'Enter a product name first' : 'Generate a description from the product details'}
+              className="inline-flex items-center gap-1.5 text-xs font-600 text-teal-700 hover:text-teal-800 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+            >
+              {refining ? (
+                <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+              ) : (
+                <HiSparkles className="w-3.5 h-3.5" />
+              )}
+              {refining ? 'Refining…' : 'Refine with AI'}
+            </button>
+          </div>
           <textarea
             placeholder="Describe your product: features, materials, dimensions, use cases..."
             value={description}

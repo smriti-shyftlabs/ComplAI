@@ -5,6 +5,7 @@ import {
   FiSearch, FiHome, FiPlusCircle, FiShield, FiCheckSquare,
   FiList, FiGlobe, FiBarChart2, FiSettings, FiCornerDownLeft, FiZap, FiX
 } from 'react-icons/fi';
+import { useTheme } from '../../context/ThemeContext';
 
 const allActions = [
   { id: 'dashboard',  label: 'Dashboard',          hint: 'Overview and key metrics',        icon: FiHome,        path: '/' },
@@ -18,6 +19,7 @@ const allActions = [
 ];
 
 export default function CommandPalette() {
+  const { isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState(0);
@@ -98,7 +100,7 @@ export default function CommandPalette() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
             className="fixed inset-0 z-[60]"
-            style={{ background: 'rgba(12,53,48,0.5)', backdropFilter: 'blur(6px)' }}
+            style={{ background: isDark ? 'rgba(0,10,9,0.7)' : 'rgba(12,53,48,0.5)', backdropFilter: 'blur(6px)' }}
             onClick={close}
           />
 
@@ -114,15 +116,15 @@ export default function CommandPalette() {
             <div
               className="rounded-2xl overflow-hidden"
               style={{
-                background: '#fff',
-                boxShadow: '0 32px 80px rgba(12,53,48,0.28), 0 8px 24px rgba(12,53,48,0.12)',
-                border: '1px solid #BDD8D3',
+                background: isDark ? '#122420' : '#fff',
+                boxShadow: isDark ? '0 32px 80px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4)' : '0 32px 80px rgba(12,53,48,0.28), 0 8px 24px rgba(12,53,48,0.12)',
+                border: isDark ? '1px solid rgba(43,160,144,0.2)' : '1px solid #BDD8D3',
               }}
             >
               {/* Search row */}
               <div
                 className="flex items-center gap-3 px-4"
-                style={{ height: 56, borderBottom: '1px solid #E5F3F0' }}
+                style={{ height: 56, borderBottom: `1px solid ${isDark ? 'rgba(43,160,144,0.12)' : '#E5F3F0'}` }}
               >
                 <FiSearch style={{ color: '#2BA090', width: 18, height: 18, flexShrink: 0 }} />
                 <input
@@ -132,14 +134,14 @@ export default function CommandPalette() {
                   onKeyDown={handleKey}
                   placeholder="Search pages, actions..."
                   className="flex-1 bg-transparent outline-none"
-                  style={{ color: '#0C3530', fontSize: '0.95rem', fontWeight: 500 }}
+                  style={{ color: isDark ? '#DDF0ED' : '#0C3530', fontSize: '0.95rem', fontWeight: 500 }}
                 />
                 <button
                   onClick={close}
                   className="flex items-center justify-center rounded-lg transition-all"
-                  style={{ width: 28, height: 28, background: '#F0FAF8', border: '1px solid #BDD8D3', color: '#7EC8BE', flexShrink: 0 }}
-                  onMouseEnter={e => e.currentTarget.style.background = '#C5E8E3'}
-                  onMouseLeave={e => e.currentTarget.style.background = '#F0FAF8'}
+                  style={{ width: 28, height: 28, background: isDark ? '#182E2B' : '#F0FAF8', border: `1px solid ${isDark ? 'rgba(43,160,144,0.2)' : '#BDD8D3'}`, color: '#7EC8BE', flexShrink: 0 }}
+                  onMouseEnter={e => e.currentTarget.style.background = isDark ? '#1E3531' : '#C5E8E3'}
+                  onMouseLeave={e => e.currentTarget.style.background = isDark ? '#182E2B' : '#F0FAF8'}
                 >
                   <FiX style={{ width: 13, height: 13 }} />
                 </button>
@@ -179,14 +181,14 @@ export default function CommandPalette() {
                               style={{
                                 width: 36,
                                 height: 36,
-                                background: isSelected ? '#C5E8E3' : '#F4FBFA',
+                                background: isSelected ? (isDark ? '#1E3531' : '#C5E8E3') : (isDark ? '#182E2B' : '#F4FBFA'),
                                 transition: 'background 0.15s',
                               }}
                             >
                               <Icon style={{ width: 16, height: 16, color: isSelected ? '#0C3530' : '#2BA090' }} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p style={{ color: '#0C3530', fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.3 }}>
+                              <p style={{ color: isDark ? '#DDF0ED' : '#0C3530', fontSize: '0.875rem', fontWeight: 600, lineHeight: 1.3 }}>
                                 {action.label}
                               </p>
                               <p style={{ color: '#7EC8BE', fontSize: '0.72rem', marginTop: 1 }}>
@@ -207,7 +209,7 @@ export default function CommandPalette() {
               {/* Footer hints */}
               <div
                 className="flex items-center gap-4 px-4 py-2"
-                style={{ borderTop: '1px solid #E5F3F0', background: '#FAFFFE' }}
+                style={{ borderTop: `1px solid ${isDark ? 'rgba(43,160,144,0.12)' : '#E5F3F0'}`, background: isDark ? '#0F201E' : '#FAFFFE' }}
               >
                 {[
                   { keys: ['↑', '↓'], label: 'Navigate' },

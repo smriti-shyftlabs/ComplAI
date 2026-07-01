@@ -350,6 +350,77 @@ async function claudeChat(question) {
 }
 
 /** Main chat entry point. */
+// ── Description refinement ────────────────────────────────────────────────
+// Category-specific traits so the offline draft is grounded in the real product.
+const CATEGORY_TRAITS = {
+  Electronics: 'reliable connectivity, energy-efficient performance, and a clearly stated manufacturer warranty',
+  'Food & Beverage': 'carefully sourced ingredients, a compliant nutrition-facts panel, and clear allergen labeling',
+  'Health & Beauty': 'a skin-friendly formulation with the full ingredient list provided in INCI format',
+  Toys: 'child-safe construction, appropriate age grading, and small-parts warnings where relevant',
+  Apparel: 'comfortable, durable materials with clear care instructions and country-of-origin labeling',
+  'Home & Garden': 'sturdy construction and low-maintenance materials suited to everyday home use',
+  Industrial: 'construction that meets recognized industrial safety standards with complete hazard documentation',
+  Automotive: 'standards-compliant build quality with clearly listed compatibility details',
+  Sports: 'a performance-oriented design focused on comfort and durability during active use',
+  Books: 'complete edition, format, and publication details',
+};
+
+const usd = (v) => {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0
+    ? new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(n)
+    : '';
+};
+
+function fallbackDescription({ name, brand, category, productType, price, description }) {
+  const productName = (name || '').trim();
+  const type = (productType || '').trim();
+  const cat = (category || '').trim();
+  const headNoun = type && type.toLowerCase() !== cat.toLowerCase() ? type.toLowerCase() : (cat ? cat.toLowerCase() : 'product');
+  const subject = productName || (brand ? `${brand} ${headNoun}` : `This ${headNoun}`);
+  const brandPart = brand && productName ? ` by ${brand}` : '';
+  const traits = CATEGORY_TRAITS[cat] || 'quality materials, practical features, and complete product documentation';
+
+  const parts = [];
+  parts.push(`The ${subject}${brandPart} is a ${headNoun}${cat ? ` in the ${cat} category` : ''}, offering ${traits}.`);
+
+  const notes = (description || '').replace(/\s+/g, ' ').trim();
+  if (notes && notes.length > 3) {
+    parts.push(`${notes.charAt(0).toUpperCase()}${notes.slice(1)}${/[.!?]$/.test(notes) ? '' : '.'}`);
+  }
+
+  const priceStr = usd(price);
+  if (priceStr) parts.push(`Priced at ${priceStr}, it delivers strong value for its category.`);
+
+  parts.push('The listing details key specifications and includes all applicable compliance and certification information so buyers can purchase with confidence.');
+  return parts.join(' ').replace(/\s+/g, ' ').trim();
+}
+
+/** Generate/refine a product description grounded in the entered product details. */
+export async function refineDescription({ name = '', brand = '', category = '', productType = '', price = '', description = '' } = {}) {
+  // Don't fabricate a description when no product has been entered.
+  if (!String(name).trim()) return '';
+
+  if (client) {
+    try {
+      const res = await client.messages.create({
+        model: MODEL,
+        max_tokens: 400,
+        system: 'You are a product copywriter for an e-commerce compliance platform. Using ONLY the product details provided, write a specific, accurate product description of 60–110 words that clearly reflects this exact product (its name, brand, type, category, and price). Do not invent specs that contradict the details, and avoid unverified medical/health claims or absolute superlatives. Return ONLY the description text — no preamble, headings, or quotes.',
+        messages: [{
+          role: 'user',
+          content: `Product details:\nName: ${name || '(unspecified)'}\nBrand: ${brand || '(unspecified)'}\nType: ${productType || '(unspecified)'}\nCategory: ${category || '(unspecified)'}\nPrice (USD): ${price || '(unspecified)'}\nExisting notes: ${description || '(none)'}`,
+        }],
+      });
+      const text = res.content.find(b => b.type === 'text')?.text?.trim();
+      if (text) return text;
+    } catch (err) {
+      console.warn('[ai] refineDescription failed, using fallback:', err.message);
+    }
+  }
+  return fallbackDescription({ name, brand, category, productType, price, description });
+}
+
 export async function chatbotResponse(question) {
   const q = (question || '').trim();
   if (!q) return 'Ask me about compliance rules, certifications, or any product in your catalog.';

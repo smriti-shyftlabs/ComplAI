@@ -33,6 +33,7 @@ function buildPayload(values, readinessScore) {
   return {
     name: values.name,
     brand: values.brand,
+    vendorEmail: values.vendorEmail || '',
     sku: values.sku || '',
     category: values.category,
     productType: values.productType,
@@ -93,6 +94,9 @@ export default function AddProduct() {
 
   const handleAnalyze = async () => {
     const errs = validateProduct(values.category, values);
+    const email = (values.vendorEmail || '').trim();
+    if (!email) errs.vendorEmail = 'Vendor email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errs.vendorEmail = 'Enter a valid email address';
     if (Object.keys(errs).length > 0) { setErrors(errs); return; }
     setErrors({});
     setAnalyzing(true);
@@ -239,11 +243,11 @@ export default function AddProduct() {
               ) : !hasAnalysis ? (
                 <>
                   <Button variant="primary" fullWidth icon={FiZap}
-                    disabled={!readiness.mandatoryComplete}
+                    disabled={!readiness.mandatoryComplete || !(values.vendorEmail || '').trim()}
                     onClick={handleAnalyze}>
                     Run Compliance Analysis
                   </Button>
-                  {!readiness.mandatoryComplete && (
+                  {(!readiness.mandatoryComplete || !(values.vendorEmail || '').trim()) && (
                     <p className="text-xs text-gray-500 text-center">Complete all required fields to enable analysis.</p>
                   )}
                 </>

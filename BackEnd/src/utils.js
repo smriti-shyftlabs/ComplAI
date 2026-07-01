@@ -17,3 +17,7 @@ export const checkPassword = (plain, hashed) => hashPassword(plain) === hashed;
 
 export const initials = (name) =>
   name.trim().split(/\s+/).map(w => w[0]).join('').toUpperCase().slice(0, 2);
+
+// Reviewer names used to attribute audit-trail / approval actions.
+const REVIEWERS = ['Sneha', 'Smriti', 'Kalyani Paraye'];
+export const randomReviewer = () => REVIEWERS[Math.floor(Math.random() * REVIEWERS.length)];

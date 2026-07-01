@@ -1,10 +1,12 @@
 import { useState, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import AIChat from '../components/chat/AIChat';
 import CommandPalette from '../components/common/CommandPalette';
 
 export default function MainLayout({ children }) {
+  const { isDark } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);   // mobile
   const [sidebarExpanded, setSidebarExpanded] = useState(true); // desktop hover state
   const collapseTimer = useRef(null);
@@ -19,7 +21,7 @@ export default function MainLayout({ children }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: '#F0FAF8' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: isDark ? '#0D1F1D' : '#F0FAF8' }}>
       {/* Desktop Sidebar — hover to expand */}
       <div
         className="hidden lg:flex lg:flex-shrink-0 transition-all duration-300"

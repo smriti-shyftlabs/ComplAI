@@ -123,8 +123,8 @@ export default function Login({ onSwitchToRegister }) {
         </div>
         <div className="grid grid-cols-2 gap-2.5">
           {[
-            { label: 'Admin', email: 'admin@company.com', password: 'admin123', tint: 'bg-violet-50 hover:bg-violet-100/70 ring-violet-100', name: 'text-violet-700', avatar: 'bg-violet-100 text-violet-600' },
-            { label: 'Reviewer', email: 'sarah.johnson@company.com', password: 'sarah123', tint: 'bg-teal-50 hover:bg-teal-100/70 ring-teal-100', name: 'text-teal-800', avatar: 'bg-teal-100 text-teal-700' },
+            { label: 'Sneha', email: 'sneha@shyftlabs.io', password: 'admin@123', tint: 'bg-violet-50 hover:bg-violet-100/70 ring-violet-100', name: 'text-violet-700', avatar: 'bg-violet-100 text-violet-600' },
+            { label: 'Smriti', email: 'smriti@shyftlabs.io', password: 'complai123', tint: 'bg-teal-50 hover:bg-teal-100/70 ring-teal-100', name: 'text-teal-800', avatar: 'bg-teal-100 text-teal-700' },
           ].map(acc => (
             <button
               key={acc.label}

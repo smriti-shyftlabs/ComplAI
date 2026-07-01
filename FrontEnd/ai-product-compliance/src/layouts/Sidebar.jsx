@@ -6,6 +6,7 @@ import {
   FiGlobe, FiBarChart2, FiSettings, FiLogOut, FiZap
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const navItems = [
   { label: 'Dashboard',         path: '/',           icon: FiHome },
@@ -21,6 +22,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }) {
   const location = useLocation();
   const { currentUser, logout } = useAuth();
   const [hoveredItem, setHoveredItem] = useState(null);
+  const { isDark } = useTheme();
 
   const handleLogout = () => {
     logout();
@@ -49,7 +51,7 @@ export default function Sidebar({ isOpen, onClose, isCollapsed = false }) {
         className="fixed left-0 top-0 h-full z-50 flex flex-col lg:translate-x-0 lg:static lg:z-auto overflow-hidden"
         style={{
           width: isCollapsed ? 72 : 256,
-          background: '#0C3530',
+          background: isDark ? '#071614' : '#0C3530',
           borderRight: '1px solid rgba(255,255,255,0.06)',
           transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
         }}
