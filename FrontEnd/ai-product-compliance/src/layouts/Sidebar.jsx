@@ -2,14 +2,13 @@ import { useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FiHome, FiPlusCircle, FiShield, FiCheckSquare, FiList,
+  FiHome, FiShield, FiCheckSquare, FiList,
   FiGlobe, FiBarChart2, FiSettings, FiLogOut, FiZap
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 
 const navItems = [
   { label: 'Dashboard',         path: '/',           icon: FiHome },
-  { label: 'Add Product',       path: '/products',   icon: FiPlusCircle },
   { label: 'Compliance Report', path: '/compliance', icon: FiShield },
   { label: 'Approval Queue',    path: '/approval',   icon: FiCheckSquare },
   { label: 'Audit Trail',       path: '/audit',      icon: FiList },
