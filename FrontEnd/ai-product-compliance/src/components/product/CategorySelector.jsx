@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiChevronDown, FiSearch, FiCheck } from 'react-icons/fi';
+import { FiChevronDown, FiSearch, FiCheck, FiLock } from 'react-icons/fi';
 import { CATEGORIES } from '../../utils/constants';
+import { AVAILABLE_CATEGORIES } from '../../data/categorySchemas';
 
 export default function CategorySelector({ value, onChange, label = 'Category', required = false, error }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,17 +64,30 @@ export default function CategorySelector({ value, onChange, label = 'Category', 
               {filtered.length === 0 ? (
                 <p className="text-sm text-gray-400 px-3 py-2 text-center">No categories found</p>
               ) : (
-                filtered.map(category => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => { onChange(category); setIsOpen(false); setSearch(''); }}
-                    className="w-full flex items-center justify-between px-3 py-2 text-sm text-left hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-lg mx-1 w-[calc(100%-8px)]"
-                  >
-                    <span className={value === category ? 'font-600 text-blue-600' : 'text-gray-700'}>{category}</span>
-                    {value === category && <FiCheck className="w-3.5 h-3.5 text-blue-600" />}
-                  </button>
-                ))
+                filtered.map(category => {
+                  const available = AVAILABLE_CATEGORIES.includes(category);
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      disabled={!available}
+                      onClick={() => { if (!available) return; onChange(category); setIsOpen(false); setSearch(''); }}
+                      className={`w-full flex items-center justify-between px-3 py-2 text-sm text-left transition-colors rounded-lg mx-1 w-[calc(100%-8px)]
+                        ${available ? 'hover:bg-blue-50 hover:text-blue-700 cursor-pointer' : 'cursor-not-allowed opacity-60'}`}
+                    >
+                      <span className={value === category ? 'font-600 text-blue-600' : available ? 'text-gray-700' : 'text-gray-400'}>
+                        {category}
+                      </span>
+                      {value === category ? (
+                        <FiCheck className="w-3.5 h-3.5 text-blue-600" />
+                      ) : !available ? (
+                        <span className="flex items-center gap-1 text-[10px] text-gray-400">
+                          <FiLock className="w-3 h-3" /> Coming Soon
+                        </span>
+                      ) : null}
+                    </button>
+                  );
+                })
               )}
             </div>
           </motion.div>
