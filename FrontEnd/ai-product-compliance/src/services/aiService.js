@@ -16,6 +16,9 @@ export const getAllReports = () => api.get('/reports');
 
 export const analyzeProduct = (product) => api.post(`/analyze/${product.id}`, product);
 
+export const refineDescription = async (payload) =>
+  (await api.post('/refine-description', payload)).description;
+
 export const simulateAnalysis = async (onProgress) => {
   const steps = [
     'Reading Product Data',

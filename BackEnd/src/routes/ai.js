@@ -1,10 +1,21 @@
 import { Router } from 'express';
 import { Products, Reports } from '../seed.js';
-import { analyzeProduct, aiEnabled } from '../ai.js';
+import { analyzeProduct, aiEnabled, refineDescription } from '../ai.js';
 
 const router = Router();
 
 router.get('/status', (_req, res) => res.json({ aiEnabled }));
+
+// Generate/refine a product description from its details.
+router.post('/refine-description', async (req, res) => {
+  try {
+    const description = await refineDescription(req.body || {});
+    res.json({ description });
+  } catch (err) {
+    console.error('[refine] error:', err);
+    res.status(500).json({ error: 'Could not refine description' });
+  }
+});
 
 router.get('/reports', (_req, res) => res.json(Reports().sort('analyzedAt', 'desc')));
 
