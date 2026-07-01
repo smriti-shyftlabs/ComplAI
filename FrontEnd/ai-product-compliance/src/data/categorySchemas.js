@@ -24,7 +24,7 @@ export const COMMON_FIELDS = [
   { key: 'sku', label: 'SKU ID', type: 'text', required: false, placeholder: 'e.g. SKU-1001' },
   { key: 'brand', label: 'Brand', type: 'text', required: true, placeholder: 'e.g. ZenTech' },
   { key: 'price', label: 'Price ($)', type: 'number', required: true, placeholder: '0.00' },
-  { key: 'productType', label: 'Product', type: 'text', required: true, placeholder: 'e.g. Laptop' },
+  { key: 'productType', label: 'Product', type: 'text', required: false, placeholder: 'e.g. Laptop' },
   { key: 'images', label: 'Product Images', type: 'images', required: true, min: 1, max: 10 },
   { key: 'description', label: 'Description', type: 'textarea', required: true, minLength: 30 },
 ];
