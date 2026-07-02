@@ -21,7 +21,7 @@ const MARKETS = ['US'];
 // Category is handled by CategorySelector; images/description have bespoke UI.
 export const COMMON_FIELDS = [
   { key: 'name', label: 'Product Name', type: 'text', required: true, placeholder: 'e.g. ZenTech UltraBook Pro 14' },
-  { key: 'sku', label: 'SKU ID', type: 'text', required: false, placeholder: 'e.g. SKU-1001' },
+  { key: 'sku', label: 'SKU ID', type: 'text', required: true, placeholder: 'e.g. SKU-1001' },
   { key: 'brand', label: 'Brand', type: 'text', required: true, placeholder: 'e.g. ZenTech' },
   { key: 'price', label: 'Price ($)', type: 'number', required: true, placeholder: '0.00' },
   { key: 'productType', label: 'Product', type: 'text', required: false, placeholder: 'e.g. Laptop' },

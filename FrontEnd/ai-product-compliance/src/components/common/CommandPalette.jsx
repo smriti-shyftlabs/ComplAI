@@ -40,7 +40,8 @@ export default function CommandPalette() {
   }, []);
 
   const execute = useCallback((action) => {
-    navigate(action.path);
+    // "Add Product" always starts a fresh, blank product entry.
+    navigate(action.path, action.path === '/products' ? { state: { newProduct: true } } : undefined);
     close();
   }, [navigate, close]);
 

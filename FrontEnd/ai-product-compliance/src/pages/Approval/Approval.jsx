@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiFilter, FiGlobe, FiCheckCircle } from 'react-icons/fi';
+import { FiFilter, FiGlobe, FiCheckCircle, FiUpload, FiPlus } from 'react-icons/fi';
 import ApprovalCard from '../../components/approval/ApprovalCard';
 import ReviewerPanel from '../../components/approval/ReviewerPanel';
 import ApprovalHistory from '../../components/approval/ApprovalHistory';
+import BulkUploadModal from '../../components/product/BulkUploadModal';
 import Button from '../../components/common/Button';
 import DateFilter from '../../components/common/DateFilter';
 import { SkeletonCard } from '../../components/common/Loader';
@@ -26,7 +28,8 @@ function formatDateTime(iso) {
 }
 
 export default function Approval() {
-  const { products, loading, updateProduct, publishProduct } = useProducts();
+  const navigate = useNavigate();
+  const { products, loading, updateProduct, publishProduct, refetch } = useProducts();
   const { currentUser } = useAuth();
   const { isDark } = useTheme();
   const { showToast } = useToast();
@@ -36,6 +39,7 @@ export default function Approval() {
   const [publishingId, setPublishingId] = useState(null);
   const [marketplaceById, setMarketplaceById] = useState({});
   const [history, setHistory] = useState([]);
+  const [bulkOpen, setBulkOpen] = useState(false);
 
   const pending   = products.filter(p => p.status === 'pending');
   const approved  = products.filter(p => p.status === 'approved');
@@ -117,9 +121,15 @@ export default function Approval() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: textPri, margin: 0 }}>Products</h1>
-        <p style={{ fontSize: 13, color: textSec, marginTop: 2 }}>Review, approve, and publish product submissions</p>
+      <div className="flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h1 style={{ fontSize: 22, fontWeight: 700, color: textPri, margin: 0 }}>Products</h1>
+          <p style={{ fontSize: 13, color: textSec, marginTop: 2 }}>Review, approve, and publish product submissions</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" icon={FiUpload} onClick={() => setBulkOpen(true)}>Bulk Upload via CSV</Button>
+          <Button icon={FiPlus} onClick={() => navigate('/products', { state: { newProduct: true } })}>Add New Product</Button>
+        </div>
       </div>
 
       {/* ── Tab bar — full width so no empty space above ReviewerPanel ── */}
@@ -446,6 +456,12 @@ export default function Approval() {
           </div>
         </div>
       )}
+
+      <BulkUploadModal
+        isOpen={bulkOpen}
+        onClose={() => setBulkOpen(false)}
+        onImported={refetch}
+      />
     </div>
   );
 }
