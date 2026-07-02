@@ -1,18 +1,46 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiAlertCircle } from 'react-icons/fi';
 import { getUsers } from '../../services/userService';
 
-export default function ReviewerPanel() {
+const PUBLISH_MIN_SCORE = 75;
+
+export default function ReviewerPanel({ products = [] }) {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     getUsers().then(setUsers).catch(() => setUsers([]));
   }, []);
 
+  // Live queue overview derived from the products in the review pipeline.
+  const pending = products.filter(p => p.status === 'pending');
+  const awaitingPublish = products.filter(
+    p => p.status === 'approved' && (Number(p.complianceScore) || 0) >= PUBLISH_MIN_SCORE
+  );
+  const rejected = products.filter(p => p.status === 'rejected');
+  const published = products.filter(p => p.status === 'published');
+
+  const stats = [
+    { label: 'Pending', value: pending.length },
+    { label: 'Awaiting Publish', value: awaitingPublish.length },
+    { label: 'Rejected', value: rejected.length },
+    { label: 'Published', value: published.length },
+  ];
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-5">
       <div>
+        <h3 className="text-sm font-600 text-gray-900 mb-3">Queue Overview</h3>
+        <div className="grid grid-cols-2 gap-2">
+          {stats.map(s => (
+            <div key={s.label} className="rounded-lg bg-gray-50 px-3 py-2.5">
+              <p className="text-lg font-700 text-teal-700 leading-tight">{s.value}</p>
+              <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="border-t border-gray-100 pt-4">
         <h3 className="text-sm font-600 text-gray-900 mb-4">Assigned Reviewers</h3>
         <div className="space-y-3">
           {users.map((user) => (
@@ -64,25 +92,6 @@ export default function ReviewerPanel() {
         </div>
       </div>
 
-      <div className="border-t border-gray-100 pt-4">
-        <div className="flex items-center gap-2 mb-3">
-          <FiAlertCircle className="w-4 h-4 text-yellow-500" />
-          <h3 className="text-sm font-600 text-gray-900">Priority Queue</h3>
-        </div>
-        <div className="space-y-2">
-          {[
-            { label: 'Critical Risk', count: 3, color: 'text-red-600 bg-red-50' },
-            { label: 'High Risk', count: 8, color: 'text-orange-600 bg-orange-50' },
-            { label: 'Medium Risk', count: 21, color: 'text-yellow-600 bg-yellow-50' },
-            { label: 'Low Risk', count: 15, color: 'text-teal-700 bg-teal-50' }
-          ].map(item => (
-            <div key={item.label} className={`flex items-center justify-between px-3 py-2 rounded-lg ${item.color}`}>
-              <span className="text-xs font-500">{item.label}</span>
-              <span className="text-xs font-700">{item.count}</span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

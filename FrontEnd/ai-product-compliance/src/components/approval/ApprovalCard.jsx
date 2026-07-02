@@ -1,15 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiMessageSquare, FiCheck, FiX } from 'react-icons/fi';
+import { FiMessageSquare, FiCheck, FiX, FiAlertTriangle, FiCheckCircle } from 'react-icons/fi';
 import Button from '../common/Button';
-import { StatusBadge, RiskBadge } from '../common/Badge';
+import { StatusBadge, RiskBadge, SeverityBadge } from '../common/Badge';
 import ComplianceScore from '../compliance/ComplianceScore';
+import { getComplianceReport } from '../../services/aiService';
 import { formatCurrency, formatDate } from '../../utils/helpers';
+
+// Left-accent colour per severity (red for critical/high, yellow for medium, teal for low).
+const SEV_ACCENT = {
+  critical: 'border-red-400 bg-red-50',
+  high: 'border-orange-400 bg-orange-50',
+  medium: 'border-yellow-400 bg-yellow-50',
+  low: 'border-teal-400 bg-teal-50',
+};
 
 export default function ApprovalCard({ product, onApprove, onReject, index = 0 }) {
   const [comment, setComment] = useState('');
   const [showComment, setShowComment] = useState(false);
   const [submitting, setSubmitting] = useState(null); // 'approve' | 'reject' | null
+  const [violations, setViolations] = useState([]);
+  const [reportLoaded, setReportLoaded] = useState(false);
+
+  // Load the product's compliance report so we can surface its violations.
+  useEffect(() => {
+    let active = true;
+    getComplianceReport(product.id)
+      .then(r => { if (active) { setViolations(r?.violations || []); setReportLoaded(!!r); } })
+      .catch(() => { if (active) { setViolations([]); setReportLoaded(false); } });
+    return () => { active = false; };
+  }, [product.id]);
 
   const handleAction = async (type) => {
     if (submitting) return; // guard double-submit
@@ -64,6 +84,43 @@ export default function ApprovalCard({ product, onApprove, onReject, index = 0 }
           </div>
 
           <p className="text-xs text-gray-500 mt-3 line-clamp-2">{product.description}</p>
+
+          {/* Violations */}
+          {violations.length > 0 && (
+            <div className="mt-4">
+              <div className="flex items-center gap-1.5 mb-2">
+                <FiAlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                <span className="text-xs font-600 text-gray-700">
+                  Violations ({violations.length})
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {violations.map((v, idx) => (
+                  <div
+                    key={v.ruleId || idx}
+                    className={`flex items-start gap-2 rounded-lg border-l-4 px-3 py-2 ${SEV_ACCENT[v.severity] || 'border-gray-300 bg-gray-50'}`}
+                  >
+                    <SeverityBadge severity={v.severity} />
+                    <div className="min-w-0">
+                      <p className="text-xs font-600 text-gray-900">{v.rule}</p>
+                      <p className="text-xs text-gray-600">{v.description}</p>
+                      {v.fix && (
+                        <p className="text-xs text-gray-700 mt-0.5"><span className="font-600">Fix:</span> {v.fix}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Clean — report ran with zero violations */}
+          {reportLoaded && violations.length === 0 && (
+            <div className="mt-4 flex items-center gap-2 rounded-lg border-l-4 border-teal-400 bg-teal-50 px-3 py-2">
+              <FiCheckCircle className="w-4 h-4 text-teal-600 flex-shrink-0" />
+              <span className="text-xs font-600 text-teal-800">No violations — meets all compliance rules</span>
+            </div>
+          )}
 
           {/* Comment Box */}
           {showComment && (

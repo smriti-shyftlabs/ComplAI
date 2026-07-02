@@ -11,7 +11,7 @@ import { useTheme } from '../context/ThemeContext';
 const navItems = [
   { label: 'Dashboard',         path: '/',           icon: FiHome },
   { label: 'Compliance Report', path: '/compliance', icon: FiShield },
-  { label: 'Approval Queue',    path: '/approval',   icon: FiCheckSquare },
+  { label: 'Products',          path: '/approval',   icon: FiCheckSquare },
   { label: 'Audit Trail',       path: '/audit',      icon: FiList },
   { label: 'Published',         path: '/published',  icon: FiGlobe },
   { label: 'Analytics',         path: '/analytics',  icon: FiBarChart2 },
