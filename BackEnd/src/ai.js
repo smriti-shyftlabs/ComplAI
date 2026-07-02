@@ -9,10 +9,13 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Products, Reports, Rules, Approvals } from './seed.js';
 import { generateId } from './utils.js';
+import { evaluateUsLaptop, isUsLaptop } from './rules/usLaptop.js';
+import { auraEnabled, auraChat } from './aura.js';
 
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-4-8';
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
-export const aiEnabled = !!client;
+// Aura (hackathon gateway) is the preferred AI provider; Anthropic is a fallback.
+export const aiEnabled = auraEnabled || !!client;
 
 // ── Category-specific violation templates (mock engine) ─────────────────────
 const violationTemplates = {
@@ -176,6 +179,59 @@ Score 0-100 (certificate validity 30%, image quality/count 20%, label requiremen
   return parsed;
 }
 
+/** Pull the first well-formed JSON object out of a model response. */
+function extractJson(text) {
+  let s = String(text || '').trim();
+  // Strip ```json … ``` fences if present.
+  const fence = s.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  if (fence) s = fence[1].trim();
+  // Otherwise grab from the first { to the last }.
+  if (s[0] !== '{') {
+    const start = s.indexOf('{');
+    const end = s.lastIndexOf('}');
+    if (start !== -1 && end > start) s = s.slice(start, end + 1);
+  }
+  return JSON.parse(s);
+}
+
+/**
+ * Aura (OpenAI-compatible) analysis — mirrors claudeReport's output shape.
+ * NB: the gateway's `response_format: json_object` collapses generative prompts
+ * to `{}`, so we ask for JSON in the prompt and parse it defensively instead.
+ */
+async function auraReport(product) {
+  const ruleNames = Rules().findAll().map(r => r.rule || r.name).filter(Boolean).slice(0, 30);
+  const system = 'You are an e-commerce product compliance analyst. Respond with ONLY a single valid JSON object — no markdown fences, no prose. Never return an empty object; always fill every field with a real analysis.';
+  const user = `Score this product for US/EU marketplace compliance from 0-100 (higher = more compliant) and list concrete issues.
+
+Product:
+- Name: ${product.name}
+- Category: ${product.category}
+- Brand: ${product.brand || 'n/a'}
+- Description: ${product.description || '(none)'}
+- Images provided: ${(product.images || []).length}
+- Certificates provided: ${(product.certificates || []).length}
+Known rule areas: ${ruleNames.join(', ') || 'general safety, labeling, certification, hazmat, country of origin'}.
+
+Scoring weights: certificate validity 30%, image quality/count 20%, label requirements 20%, description completeness 15%, safety standards 15%. riskLevel: low (>=75), medium (50-74), high (<50).
+
+Return EXACTLY this JSON structure, filled in:
+{"score": <int 0-100>, "riskLevel": "low|medium|high", "confidence": <int 80-99>, "recommendation": "<one sentence>", "violations": [{"rule":"<name>","severity":"critical|high|medium|low","description":"<what is wrong>","fix":"<how to fix>"}], "suggestions": [{"text":"<improvement>","priority":"high|medium|low"}]}`;
+
+  const text = await auraChat({ system, user, maxTokens: 1500, metadata: { domain: 'analysis', complexity: 'complex' } });
+  const parsed = extractJson(text);
+  if (parsed.score == null || Number.isNaN(Number(parsed.score))) {
+    throw new Error('Aura analysis returned no score');   // → analyzeProduct falls back to mockReport
+  }
+  parsed.score = Math.max(0, Math.min(100, Math.round(Number(parsed.score))));
+  if (!parsed.riskLevel) parsed.riskLevel = parsed.score >= 75 ? 'low' : parsed.score >= 50 ? 'medium' : 'high';
+  parsed.violations = parsed.violations || [];
+  parsed.suggestions = (parsed.suggestions || []).map((s, i) => ({ id: i + 1, category: 'enhancement', ...s }));
+  parsed.confidence = parsed.confidence ?? 90;
+  parsed.engine = 'aura';
+  return parsed;
+}
+
 /**
  * Analyze a product, cache + persist the report, and update the product.
  * Pass { force: true } to re-generate after a product was edited (drops the
@@ -187,11 +243,16 @@ export async function analyzeProduct(product, { force = false } = {}) {
   if (cached && force) Reports().deleteWhere(r => r.productId === product.id);
 
   let result;
-  try {
-    result = client ? await claudeReport(product) : mockReport(product);
-  } catch (err) {
-    console.warn('[ai] Claude analysis failed, using fallback:', err.message);
-    result = mockReport(product);
+  if (isUsLaptop(product)) {
+    // US Electronics/Laptop → deterministic rule engine makes the decision.
+    result = evaluateUsLaptop(product);
+  } else {
+    try {
+      result = auraEnabled ? await auraReport(product) : client ? await claudeReport(product) : mockReport(product);
+    } catch (err) {
+      console.warn('[ai] Claude analysis failed, using fallback:', err.message);
+      result = mockReport(product);
+    }
   }
 
   const report = {
@@ -201,15 +262,18 @@ export async function analyzeProduct(product, { force = false } = {}) {
     category: product.category,
     score: result.score,
     riskLevel: result.riskLevel,
+    status: result.status,          // GREEN | YELLOW | RED (rule engine only)
+    riskScore: result.riskScore,    // additive severity score (rule engine only)
     violations: result.violations || [],
     suggestions: result.suggestions || [],
     confidence: result.confidence,
     recommendation: result.recommendation,
+    nextActions: result.nextActions || [],
     analyzedAt: new Date().toISOString(),
-    rulesChecked: 20,
-    rulesPassed: 20 - (result.violations?.length || 0),
-    rulesFailed: result.violations?.length || 0,
-    engine: client ? 'claude' : 'mock',
+    rulesChecked: result.rulesChecked ?? 20,
+    rulesPassed: result.rulesPassed ?? (20 - (result.violations?.length || 0)),
+    rulesFailed: result.rulesFailed ?? (result.violations?.length || 0),
+    engine: result.engine || (client ? 'claude' : 'mock'),
   };
 
   Reports().insert(report);
@@ -401,6 +465,19 @@ export async function refineDescription({ name = '', brand = '', category = '', 
   // Don't fabricate a description when no product has been entered.
   if (!String(name).trim()) return '';
 
+  if (auraEnabled) {
+    try {
+      const text = await auraChat({
+        system: 'You are a product copywriter for an e-commerce compliance platform. Using ONLY the product details provided, write a specific, accurate product description of 60–110 words that clearly reflects this exact product (its name, brand, type, category, and price). Do not invent specs that contradict the details, and avoid unverified medical/health claims or absolute superlatives. Return ONLY the description text — no preamble, headings, or quotes.',
+        user: `Product details:\nName: ${name || '(unspecified)'}\nBrand: ${brand || '(unspecified)'}\nType: ${productType || '(unspecified)'}\nCategory: ${category || '(unspecified)'}\nPrice (USD): ${price || '(unspecified)'}\nExisting notes: ${description || '(none)'}`,
+        maxTokens: 400,
+      });
+      if (text) return text.trim();
+    } catch (err) {
+      console.warn('[ai] Aura refine failed, using fallback:', err.message);
+    }
+  }
+
   if (client) {
     try {
       const res = await client.messages.create({
@@ -435,7 +512,21 @@ export async function chatbotResponse(question) {
   const dataAnswer = await handleDataIntent(q);
   if (dataAnswer) return dataAnswer;
 
-  // 2. Real Claude for general regulatory questions when available
+  // 2a. Aura (preferred) for general regulatory questions
+  if (auraEnabled) {
+    try {
+      const answer = await auraChat({
+        system: 'You are ComplAI, the built-in assistant for an e-commerce product compliance platform. Answer questions about product compliance regulations (FCC, ASTM F963, FDA, hazmat/GHS, CE/RoHS, Prop 65, country of origin, etc.) clearly and concisely. Use markdown. Keep answers under ~200 words.',
+        user: q,
+        maxTokens: 700,
+      });
+      if (answer) return answer;
+    } catch (err) {
+      console.warn('[ai] Aura chat failed, using knowledge base:', err.message);
+    }
+  }
+
+  // 2b. Real Claude for general regulatory questions when available
   if (client) {
     try {
       const answer = await claudeChat(q);
