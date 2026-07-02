@@ -35,7 +35,7 @@ const SETTINGS_SEED = [
   { id: 'CFG-005', key: 'enableEmailNotifications', value: true, label: 'Email Notifications',      description: 'Send email alerts on approval decisions.' },
 ];
 
-const SEED_VERSION = 'v2';
+const SEED_VERSION = 'v3';
 
 export function initDB() {
   // version table for forced reseeds
