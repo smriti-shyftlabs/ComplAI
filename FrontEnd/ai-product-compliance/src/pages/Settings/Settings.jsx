@@ -4,6 +4,7 @@ import { FiUser, FiShield, FiBell, FiUsers, FiLink, FiPlus, FiEdit2, FiTrash2 } 
 import { getUsers } from '../../services/userService';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
+import Select from '../../components/common/Select';
 import { SeverityBadge } from '../../components/common/Badge';
 import { RULE_CATEGORIES, getRulesForCategory } from '../../data/categoryComplianceRules';
 
@@ -147,24 +148,18 @@ export default function Settings() {
                     value={general.adminEmail}
                     onChange={e => setGeneral(g => ({ ...g, adminEmail: e.target.value }))}
                   />
-                  <div>
-                    <label className="block text-sm font-500 text-gray-700 mb-1.5">Timezone</label>
-                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white">
-                      <option>UTC-5 (Eastern)</option>
-                      <option>UTC-8 (Pacific)</option>
-                      <option>UTC+0 (London)</option>
-                      <option>UTC+1 (Berlin)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-500 text-gray-700 mb-1.5">Language</label>
-                    <select className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white">
-                      <option>English</option>
-                      <option>Spanish</option>
-                      <option>French</option>
-                      <option>German</option>
-                    </select>
-                  </div>
+                  <Select
+                    label="Timezone"
+                    value="UTC-5 (Eastern)"
+                    onChange={() => {}}
+                    options={['UTC-5 (Eastern)', 'UTC-8 (Pacific)', 'UTC+0 (London)', 'UTC+1 (Berlin)']}
+                  />
+                  <Select
+                    label="Language"
+                    value="English"
+                    onChange={() => {}}
+                    options={['English', 'Spanish', 'French', 'German']}
+                  />
                 </div>
                 <div className="space-y-3 pt-2 border-t border-gray-100">
                   <h3 className="text-sm font-600 text-gray-700 pt-2">Compliance Thresholds</h3>

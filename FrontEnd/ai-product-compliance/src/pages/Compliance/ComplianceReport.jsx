@@ -19,11 +19,46 @@ const DECISION_CONFIG = {
   reject: { status: 'rejected', run: rejectProduct, message: 'Product rejected.' },
 };
 
-const scoreColor = (s) =>
-  s >= 90 ? 'bg-teal-100 text-teal-800'
-  : s >= 75 ? 'bg-blue-100 text-blue-700'
-  : s >= 50 ? 'bg-yellow-100 text-yellow-700'
-  : 'bg-red-100 text-red-700';
+const scoreHex = (s) =>
+  s >= 90 ? '#0C9A7B'
+  : s >= 75 ? '#3B82F6'
+  : s >= 50 ? '#F59E0B'
+  : '#EF4444';
+
+/* Mini circular score ring — used in the product list */
+function MiniScore({ score }) {
+  const color = scoreHex(score);
+  const r = 17;
+  const stroke = 2.8;
+  const circ = 2 * Math.PI * r;
+  const offset = circ - (score / 100) * circ;
+  return (
+    <div style={{ position: 'relative', width: 46, height: 46, flexShrink: 0 }}>
+      <svg width="46" height="46" viewBox="0 0 44 44" style={{ transform: 'rotate(-90deg)', display: 'block' }}>
+        {/* Track */}
+        <circle cx="22" cy="22" r={r} fill="none"
+          stroke="currentColor" strokeOpacity="0.1" strokeWidth={stroke} />
+        {/* Progress */}
+        <circle cx="22" cy="22" r={r} fill="none"
+          stroke={color} strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={circ}
+          strokeDashoffset={offset}
+          style={{ transition: 'stroke-dashoffset 0.6s ease' }}
+        />
+      </svg>
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        gap: 0,
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color, lineHeight: 1 }}>{score}</span>
+        <span style={{ fontSize: 7.5, color: '#9CA3AF', lineHeight: 1.2, letterSpacing: '0.02em' }}>/100</span>
+      </div>
+    </div>
+  );
+}
 
 function Spinner({ label }) {
   return (
@@ -133,10 +168,7 @@ export default function ComplianceReport() {
                 onClick={() => openReport(p)}
                 className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors text-left"
               >
-                <span className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${scoreColor(p.complianceScore)}`}>
-                  <span className="text-sm font-700 leading-none">{p.complianceScore}</span>
-                  <span className="text-[9px] opacity-70">/100</span>
-                </span>
+                <MiniScore score={p.complianceScore ?? 0} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-600 text-gray-900 truncate">{p.name}</p>
                   <p className="text-xs text-gray-500">{p.brand} · {p.category}</p>

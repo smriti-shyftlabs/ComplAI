@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiSearch, FiDownload } from 'react-icons/fi';
 import AuditTimeline from '../../components/approval/AuditTimeline';
 import Button from '../../components/common/Button';
+import Select from '../../components/common/Select';
 import { getAuditLog } from '../../services/approvalService';
 
 export default function AuditTrail() {
@@ -65,20 +66,18 @@ export default function AuditTrail() {
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
           />
         </div>
-        <select
+        <Select
           value={actionFilter}
-          onChange={e => setActionFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
-        >
-          {actions.map(a => <option key={a} value={a}>{a === 'all' ? 'All Actions' : a}</option>)}
-        </select>
-        <select
+          onChange={setActionFilter}
+          options={actions.map(a => ({ value: a, label: a === 'all' ? 'All Actions' : a }))}
+          className="w-44"
+        />
+        <Select
           value={userFilter}
-          onChange={e => setUserFilter(e.target.value)}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
-        >
-          {users.map(u => <option key={u} value={u}>{u === 'all' ? 'All Users' : u}</option>)}
-        </select>
+          onChange={setUserFilter}
+          options={users.map(u => ({ value: u, label: u === 'all' ? 'All Users' : u }))}
+          className="w-40"
+        />
         <span className="text-xs text-gray-400 ml-auto">{filtered.length} entries</span>
       </div>
 

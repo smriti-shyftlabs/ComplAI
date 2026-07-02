@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiChevronUp, FiChevronDown, FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
 import { StatusBadge, RiskBadge } from '../common/Badge';
+import Select from '../common/Select';
 import { formatDate, formatCurrency } from '../../utils/helpers';
 import { CATEGORIES } from '../../utils/constants';
 
@@ -77,25 +78,27 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
             className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
           />
         </div>
-        <select
+        <Select
           value={statusFilter}
-          onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
-        >
-          <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
-          <option value="published">Published</option>
-        </select>
-        <select
+          onChange={v => { setStatusFilter(v); setPage(1); }}
+          options={[
+            { value: 'all',       label: 'All Status'  },
+            { value: 'pending',   label: 'Pending'     },
+            { value: 'approved',  label: 'Approved'    },
+            { value: 'rejected',  label: 'Rejected'    },
+            { value: 'published', label: 'Published'   },
+          ]}
+          className="w-36"
+        />
+        <Select
           value={categoryFilter}
-          onChange={e => { setCategoryFilter(e.target.value); setPage(1); }}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-600 bg-white"
-        >
-          <option value="all">All Categories</option>
-          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-        </select>
+          onChange={v => { setCategoryFilter(v); setPage(1); }}
+          options={[
+            { value: 'all', label: 'All Categories' },
+            ...CATEGORIES.map(c => ({ value: c, label: c })),
+          ]}
+          className="w-44"
+        />
         <span className="text-xs text-gray-400 ml-auto">{filtered.length} products</span>
       </div>
 
