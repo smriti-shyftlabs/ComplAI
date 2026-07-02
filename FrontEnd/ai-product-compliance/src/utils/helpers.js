@@ -114,6 +114,51 @@ export const sortByDate = (array, key = 'createdAt', order = 'desc') => {
   });
 };
 
+// ── Date filter shared across pages ──────────────────────────────────────────
+export const DATE_FILTER_OPTIONS = [
+  { value: 'all',     label: 'All time'    },
+  { value: 'today',   label: 'Today'       },
+  { value: 'week',    label: 'This week'   },
+  { value: 'month',   label: 'This month'  },
+  { value: 'quarter', label: 'Last 90 days'},
+  { value: 'custom',  label: 'Custom range'},
+];
+
+/**
+ * isInDateRange — supports preset strings AND custom { from, to } objects.
+ * @param {string} dateStr  — ISO date string on the record
+ * @param {string|{from:string,to:string}} range — preset key OR { from, to }
+ */
+export const isInDateRange = (dateStr, range) => {
+  if (!range || range === 'all' || !dateStr) return true;
+  const d = new Date(dateStr);
+
+  // Custom range: { from?: string, to?: string }
+  if (typeof range === 'object') {
+    const { from, to } = range;
+    if (from) {
+      const fromDate = new Date(from);
+      fromDate.setHours(0, 0, 0, 0);
+      if (d < fromDate) return false;
+    }
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      if (d > toDate) return false;
+    }
+    return true;
+  }
+
+  // Preset string ranges
+  const now = new Date();
+  const sod = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (range === 'today')   return d >= sod;
+  if (range === 'week')    return d >= new Date(+sod - 6 * 864e5);
+  if (range === 'month')   return d >= new Date(sod.getFullYear(), sod.getMonth(), 1);
+  if (range === 'quarter') return d >= new Date(+sod - 89 * 864e5);
+  return true;
+};
+
 export const filterProducts = (products, filters) => {
   return products.filter(product => {
     if (filters.status && filters.status !== 'all' && product.status !== filters.status) return false;

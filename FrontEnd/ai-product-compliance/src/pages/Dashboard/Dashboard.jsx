@@ -12,19 +12,39 @@ import { useProducts } from '../../hooks/useProducts';
 import { getAnalytics } from '../../services/metaService';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/common/Button';
+import { useTheme } from '../../context/ThemeContext';
 
 const iconMap = { FiPackage, FiShield, FiClock, FiXCircle };
-const alertIconMap = { FiAlertTriangle, FiAlertCircle, FiInfo, FiCheckCircle };
 
-const alertTypeStyles = {
-  critical: 'bg-red-50 border-l-red-500 text-red-700',
-  warning: 'bg-yellow-50 border-l-yellow-500 text-yellow-700',
-  info: 'bg-teal-50 border-l-teal-600 text-teal-800',
-  success: 'bg-teal-50 border-l-teal-600 text-teal-800'
-};
+function getAlertStyle(type, isDark) {
+  const map = {
+    critical: {
+      bg:     isDark ? 'rgba(127,29,29,0.35)'  : '#FEF2F2',
+      border: isDark ? '#DC2626' : '#EF4444',
+      color:  isDark ? '#FCA5A5' : '#B91C1C',
+    },
+    warning: {
+      bg:     isDark ? 'rgba(120,53,15,0.35)'  : '#FFFBEB',
+      border: isDark ? '#D97706' : '#F59E0B',
+      color:  isDark ? '#FCD34D' : '#92400E',
+    },
+    info: {
+      bg:     isDark ? 'rgba(12,53,48,0.55)'   : '#F0FAF8',
+      border: isDark ? '#2BA090' : '#2BA090',
+      color:  isDark ? '#7EC8BE' : '#0C3530',
+    },
+    success: {
+      bg:     isDark ? 'rgba(12,53,48,0.55)'   : '#F0FAF8',
+      border: isDark ? '#2BA090' : '#2BA090',
+      color:  isDark ? '#7EC8BE' : '#0C3530',
+    },
+  };
+  return map[type] || map.info;
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const { products } = useProducts();
   const [analytics, setAnalytics] = useState(null);
 
@@ -165,28 +185,38 @@ export default function Dashboard() {
         }
       >
         <div className="space-y-2">
-          {alerts.map((alert, i) => (
-            <motion.div
-              key={alert.id}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className={`flex items-start gap-3 p-3 rounded-lg border-l-4 ${alertTypeStyles[alert.type]}`}
-            >
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-500">{alert.message}</p>
-                <p className="text-xs opacity-60 mt-0.5">{alert.time}</p>
-              </div>
-              {alert.product && (
-                <button
-                  onClick={() => navigate('/compliance')}
-                  className="text-xs font-600 opacity-80 hover:opacity-100 flex-shrink-0 underline"
-                >
-                  View
-                </button>
-              )}
-            </motion.div>
-          ))}
+          {alerts.map((alert, i) => {
+            const s = getAlertStyle(alert.type, isDark);
+            return (
+              <motion.div
+                key={alert.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 12,
+                  padding: '10px 12px',
+                  borderRadius: 8,
+                  borderLeft: `4px solid ${s.border}`,
+                  background: s.bg,
+                  color: s.color,
+                }}
+              >
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: 13.5, fontWeight: 500, color: s.color }}>{alert.message}</p>
+                  <p style={{ fontSize: 11, opacity: 0.65, marginTop: 2 }}>{alert.time}</p>
+                </div>
+                {alert.product && (
+                  <button
+                    onClick={() => navigate('/compliance')}
+                    style={{ fontSize: 12, fontWeight: 600, color: s.color, opacity: 0.8, flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                  >
+                    View
+                  </button>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       </DashboardCard>
     </div>

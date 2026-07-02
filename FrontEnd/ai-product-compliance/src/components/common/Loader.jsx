@@ -1,3 +1,5 @@
+import { useTheme } from '../../context/ThemeContext';
+
 export function Spinner({ size = 'md', color = 'blue' }) {
   const sizes = { sm: 'w-4 h-4', md: 'w-8 h-8', lg: 'w-12 h-12', xl: 'w-16 h-16' };
   const colors = {
@@ -28,35 +30,50 @@ export function PageLoader() {
 }
 
 export function SkeletonCard() {
+  const { isDark } = useTheme();
+  const shimmer = isDark ? '#1E3530' : '#E5E7EB';
+  const shimmerAlt = isDark ? '#162C28' : '#F3F4F6';
+  const bg = isDark ? '#112320' : '#FFFFFF';
+  const border = isDark ? 'rgba(43,160,144,0.12)' : '#E5E7EB';
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
+    <div
+      className="animate-pulse rounded-xl p-6"
+      style={{ background: bg, border: `1px solid ${border}` }}
+    >
       <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 bg-gray-200 rounded-xl" />
-        <div className="flex-1 space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-3/4" />
-          <div className="h-3 bg-gray-200 rounded w-1/2" />
+        <div style={{ width: 48, height: 48, borderRadius: 12, background: shimmer, flexShrink: 0 }} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div style={{ height: 14, background: shimmer, borderRadius: 6, width: '70%' }} />
+          <div style={{ height: 11, background: shimmerAlt, borderRadius: 6, width: '45%' }} />
         </div>
       </div>
-      <div className="space-y-2">
-        <div className="h-3 bg-gray-200 rounded" />
-        <div className="h-3 bg-gray-200 rounded w-5/6" />
-        <div className="h-3 bg-gray-200 rounded w-4/6" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div style={{ height: 11, background: shimmerAlt, borderRadius: 6, width: '100%' }} />
+        <div style={{ height: 11, background: shimmer,    borderRadius: 6, width: '84%' }} />
+        <div style={{ height: 11, background: shimmerAlt, borderRadius: 6, width: '62%' }} />
       </div>
     </div>
   );
 }
 
 export function SkeletonTable({ rows = 5 }) {
+  const { isDark } = useTheme();
+  const shimmer    = isDark ? '#1E3530' : '#E5E7EB';
+  const shimmerAlt = isDark ? '#162C28' : '#F3F4F6';
+  const divider    = isDark ? 'rgba(43,160,144,0.1)' : '#F1F5F9';
   return (
     <div className="animate-pulse">
-      <div className="h-10 bg-gray-100 rounded-lg mb-3" />
+      <div style={{ height: 40, background: shimmerAlt, borderRadius: 8, marginBottom: 12 }} />
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex gap-4 py-3 border-b border-gray-100">
-          <div className="h-4 bg-gray-200 rounded w-1/5" />
-          <div className="h-4 bg-gray-200 rounded w-1/4" />
-          <div className="h-4 bg-gray-200 rounded w-1/6" />
-          <div className="h-4 bg-gray-200 rounded w-1/8" />
-          <div className="h-4 bg-gray-200 rounded w-1/6" />
+        <div
+          key={i}
+          style={{ display: 'flex', gap: 16, padding: '12px 0', borderBottom: `1px solid ${divider}` }}
+        >
+          <div style={{ height: 14, background: shimmer,    borderRadius: 6, flex: '0 0 18%' }} />
+          <div style={{ height: 14, background: shimmerAlt, borderRadius: 6, flex: '0 0 24%' }} />
+          <div style={{ height: 14, background: shimmer,    borderRadius: 6, flex: '0 0 14%' }} />
+          <div style={{ height: 14, background: shimmerAlt, borderRadius: 6, flex: '0 0 12%' }} />
+          <div style={{ height: 14, background: shimmer,    borderRadius: 6, flex: '0 0 16%' }} />
         </div>
       ))}
     </div>

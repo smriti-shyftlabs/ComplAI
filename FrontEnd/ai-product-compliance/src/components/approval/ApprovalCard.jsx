@@ -9,10 +9,17 @@ import { formatCurrency, formatDate } from '../../utils/helpers';
 export default function ApprovalCard({ product, onApprove, onReject, index = 0 }) {
   const [comment, setComment] = useState('');
   const [showComment, setShowComment] = useState(false);
+  const [submitting, setSubmitting] = useState(null); // 'approve' | 'reject' | null
 
-  const handleAction = (type) => {
-    if (type === 'approve') onApprove?.(product.id, comment);
-    else if (type === 'reject') onReject?.(product.id, comment);
+  const handleAction = async (type) => {
+    if (submitting) return; // guard double-submit
+    setSubmitting(type);
+    try {
+      if (type === 'approve') await onApprove?.(product.id, comment);
+      else if (type === 'reject') await onReject?.(product.id, comment);
+    } finally {
+      setSubmitting(null);
+    }
   };
 
   return (
@@ -81,6 +88,8 @@ export default function ApprovalCard({ product, onApprove, onReject, index = 0 }
               variant="success"
               size="sm"
               icon={FiCheck}
+              loading={submitting === 'approve'}
+              disabled={!!submitting}
               onClick={() => handleAction('approve')}
             >
               Approve
@@ -89,6 +98,8 @@ export default function ApprovalCard({ product, onApprove, onReject, index = 0 }
               variant="danger"
               size="sm"
               icon={FiX}
+              loading={submitting === 'reject'}
+              disabled={!!submitting}
               onClick={() => handleAction('reject')}
             >
               Reject

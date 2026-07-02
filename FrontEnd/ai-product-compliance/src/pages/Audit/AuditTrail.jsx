@@ -3,16 +3,25 @@ import { FiSearch, FiDownload } from 'react-icons/fi';
 import AuditTimeline from '../../components/approval/AuditTimeline';
 import Button from '../../components/common/Button';
 import Select from '../../components/common/Select';
+import DateFilter from '../../components/common/DateFilter';
+import { SkeletonTable } from '../../components/common/Loader';
 import { getAuditLog } from '../../services/approvalService';
+import { isInDateRange } from '../../utils/helpers';
 
 export default function AuditTrail() {
   const [auditLogs, setAuditLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
   const [userFilter, setUserFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
 
   useEffect(() => {
-    getAuditLog().then(setAuditLogs).catch(() => setAuditLogs([]));
+    setLoading(true);
+    getAuditLog()
+      .then(setAuditLogs)
+      .catch(() => setAuditLogs([]))
+      .finally(() => setLoading(false));
   }, []);
 
   const actions = ['all', 'Approved', 'Rejected', 'Published', 'Analyzed', 'Flagged', 'Requested Changes'];
@@ -21,6 +30,7 @@ export default function AuditTrail() {
   const filtered = auditLogs.filter(log => {
     if (actionFilter !== 'all' && log.action !== actionFilter) return false;
     if (userFilter !== 'all' && log.user !== userFilter) return false;
+    if (!isInDateRange(log.timestamp, dateFilter)) return false;
     if (search) {
       const q = search.toLowerCase();
       return log.product?.toLowerCase().includes(q) || log.user.toLowerCase().includes(q) || log.details?.toLowerCase().includes(q);
@@ -78,12 +88,15 @@ export default function AuditTrail() {
           options={users.map(u => ({ value: u, label: u === 'all' ? 'All Users' : u }))}
           className="w-40"
         />
+        <DateFilter value={dateFilter} onChange={setDateFilter} />
         <span className="text-xs text-gray-400 ml-auto">{filtered.length} entries</span>
       </div>
 
       {/* Timeline */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-6">
-        {filtered.length === 0 ? (
+        {loading ? (
+          <SkeletonTable rows={6} />
+        ) : filtered.length === 0 ? (
           <p className="text-center text-gray-400 py-8 text-sm">No audit logs match your filters</p>
         ) : (
           <AuditTimeline logs={filtered} />

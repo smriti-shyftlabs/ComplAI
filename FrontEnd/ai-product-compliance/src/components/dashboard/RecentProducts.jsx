@@ -24,7 +24,9 @@ function ScoreBar({ score }) {
 export default function RecentProducts() {
   const navigate = useNavigate();
   const { products } = useProducts();
-  const recent = products.slice(0, 6);
+  const recent = [...products]
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .slice(0, 6);
 
   return (
     <div className="overflow-x-auto -mx-1">

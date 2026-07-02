@@ -1,5 +1,5 @@
 /**
- * Select — beautiful custom dropdown, replaces native <select> everywhere.
+ * Select — beautiful custom dropdown with full keyboard navigation.
  *
  * Props:
  *   value      — currently selected value (string)
@@ -12,7 +12,7 @@
  *   disabled   — boolean
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronDown, FiCheck } from 'react-icons/fi';
 import { useTheme } from '../../context/ThemeContext';
@@ -27,8 +27,10 @@ export default function Select({
   className = '',
   disabled = false,
 }) {
-  const [open, setOpen] = useState(false);
-  const ref  = useRef(null);
+  const [open, setOpen]           = useState(false);
+  const [focusedIdx, setFocusedIdx] = useState(-1);
+  const wrapRef  = useRef(null);
+  const listRef  = useRef(null);
   const { isDark } = useTheme();
 
   // Normalise options to { value, label }
@@ -37,20 +39,76 @@ export default function Select({
   );
   const selected = items.find(i => i.value === value);
 
-  // Close when clicking outside
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  const openDropdown = useCallback(() => {
+    if (disabled) return;
+    setOpen(true);
+    const idx = items.findIndex(i => i.value === value);
+    setFocusedIdx(idx >= 0 ? idx : 0);
+  }, [disabled, items, value]);
+
+  const closeDropdown = useCallback(() => {
+    setOpen(false);
+    setFocusedIdx(-1);
+  }, []);
+
+  const selectItem = useCallback((val) => {
+    onChange(val);
+    closeDropdown();
+  }, [onChange, closeDropdown]);
+
+  // Close on click outside
   useEffect(() => {
     const handle = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) closeDropdown();
     };
     document.addEventListener('mousedown', handle);
     return () => document.removeEventListener('mousedown', handle);
-  }, []);
+  }, [closeDropdown]);
 
-  // Keyboard: Escape closes
+  // Scroll focused item into view
+  useEffect(() => {
+    if (open && focusedIdx >= 0 && listRef.current) {
+      const el = listRef.current.children[focusedIdx];
+      if (el) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [focusedIdx, open]);
+
+  // ── Keyboard handler ──────────────────────────────────────────────────────
   const onKey = (e) => {
-    if (e.key === 'Escape') setOpen(false);
+    if (disabled) return;
+    switch (e.key) {
+      case 'Escape':
+        e.preventDefault();
+        closeDropdown();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        if (!open) { openDropdown(); break; }
+        setFocusedIdx(i => Math.min(i + 1, items.length - 1));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        if (!open) { openDropdown(); break; }
+        setFocusedIdx(i => Math.max(i - 1, 0));
+        break;
+      case 'Enter':
+      case ' ':
+        e.preventDefault();
+        if (!open) { openDropdown(); break; }
+        if (focusedIdx >= 0 && focusedIdx < items.length) {
+          selectItem(items[focusedIdx].value);
+        }
+        break;
+      case 'Tab':
+        closeDropdown();
+        break;
+      default:
+        break;
+    }
   };
 
+  // ── Styles ────────────────────────────────────────────────────────────────
   const triggerStyle = {
     width: '100%',
     display: 'flex',
@@ -67,7 +125,7 @@ export default function Select({
     border: open
       ? `1px solid #2BA090`
       : isDark
-        ? `1px solid rgba(43,160,144,${open ? '0.55' : '0.25'})`
+        ? `1px solid rgba(43,160,144,0.25)`
         : `1px solid rgba(155,192,185,0.65)`,
     background: isDark
       ? open ? '#1E3531' : '#182E2B'
@@ -101,7 +159,7 @@ export default function Select({
   };
 
   return (
-    <div className={className} style={{ position: 'relative' }} ref={ref}>
+    <div className={className} style={{ position: 'relative' }} ref={wrapRef}>
       {label && (
         <label style={{
           display: 'block',
@@ -118,8 +176,10 @@ export default function Select({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => !disabled && setOpen(o => !o)}
+        onClick={() => open ? closeDropdown() : openDropdown()}
         onKeyDown={onKey}
+        aria-haspopup="listbox"
+        aria-expanded={open}
         style={triggerStyle}
       >
         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -144,20 +204,25 @@ export default function Select({
       <AnimatePresence>
         {open && (
           <motion.div
+            role="listbox"
             style={panelStyle}
             initial={{ opacity: 0, y: -6, scale: 0.97 }}
             animate={{ opacity: 1, y: 0,  scale: 1    }}
             exit={{   opacity: 0, y: -6,  scale: 0.97 }}
             transition={{ duration: 0.14, ease: 'easeOut' }}
           >
-            <div style={{ maxHeight: 224, overflowY: 'auto', padding: '4px 0' }}>
-              {items.map((item) => {
+            <div ref={listRef} style={{ maxHeight: 224, overflowY: 'auto', padding: '4px 0' }}>
+              {items.map((item, i) => {
                 const isSelected = item.value === value;
+                const isFocused  = i === focusedIdx;
                 return (
                   <button
                     key={item.value}
+                    role="option"
+                    aria-selected={isSelected}
                     type="button"
-                    onClick={() => { onChange(item.value); setOpen(false); }}
+                    onClick={() => selectItem(item.value)}
+                    onMouseEnter={() => setFocusedIdx(i)}
                     style={{
                       width: '100%',
                       display: 'flex',
@@ -174,19 +239,16 @@ export default function Select({
                       transition: 'background 0.1s',
                       background: isSelected
                         ? isDark
-                          ? 'rgba(43,160,144,0.18)'
-                          : 'rgba(43,160,144,0.08)'
-                        : 'transparent',
+                          ? 'rgba(43,160,144,0.22)'
+                          : 'rgba(43,160,144,0.1)'
+                        : isFocused
+                          ? isDark
+                            ? 'rgba(43,160,144,0.12)'
+                            : 'rgba(43,160,144,0.06)'
+                          : 'transparent',
                       color: isSelected
                         ? isDark ? '#7EC8BE' : '#155E56'
                         : isDark ? '#C8E8E3' : '#1F2937',
-                    }}
-                    onMouseEnter={e => {
-                      if (!isSelected) e.currentTarget.style.background = isDark
-                        ? 'rgba(43,160,144,0.1)' : 'rgba(43,160,144,0.05)';
-                    }}
-                    onMouseLeave={e => {
-                      if (!isSelected) e.currentTarget.style.background = 'transparent';
                     }}
                   >
                     <span>{item.label}</span>

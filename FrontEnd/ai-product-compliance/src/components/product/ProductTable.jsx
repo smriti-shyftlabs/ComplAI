@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { FiSearch, FiChevronUp, FiChevronDown, FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiEye } from 'react-icons/fi';
 import { StatusBadge, RiskBadge } from '../common/Badge';
 import Select from '../common/Select';
-import { formatDate, formatCurrency } from '../../utils/helpers';
+import DateFilter from '../common/DateFilter';
+import { formatDate, formatCurrency, isInDateRange } from '../../utils/helpers';
 import { CATEGORIES } from '../../utils/constants';
 
 const PAGE_SIZE = 10;
@@ -14,6 +15,7 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState(filterStatus);
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
   const [sortKey, setSortKey] = useState('createdAt');
   const [sortDir, setSortDir] = useState('desc');
   const [page, setPage] = useState(1);
@@ -31,6 +33,7 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
     }
     if (statusFilter !== 'all') result = result.filter(p => p.status === statusFilter);
     if (categoryFilter !== 'all') result = result.filter(p => p.category === categoryFilter);
+    if (dateFilter !== 'all') result = result.filter(p => isInDateRange(p.createdAt, dateFilter));
     result.sort((a, b) => {
       let aVal = a[sortKey], bVal = b[sortKey];
       if (typeof aVal === 'string') aVal = aVal.toLowerCase();
@@ -40,7 +43,7 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
       return 0;
     });
     return result;
-  }, [products, search, statusFilter, categoryFilter, sortKey, sortDir]);
+  }, [products, search, statusFilter, categoryFilter, dateFilter, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -98,6 +101,10 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
             ...CATEGORIES.map(c => ({ value: c, label: c })),
           ]}
           className="w-44"
+        />
+        <DateFilter
+          value={dateFilter}
+          onChange={v => { setDateFilter(v); setPage(1); }}
         />
         <span className="text-xs text-gray-400 ml-auto">{filtered.length} products</span>
       </div>

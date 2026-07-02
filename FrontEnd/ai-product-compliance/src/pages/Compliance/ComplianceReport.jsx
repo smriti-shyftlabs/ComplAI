@@ -1,18 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowLeft, FiCheck, FiX, FiDownload, FiGlobe, FiEdit2, FiChevronRight } from 'react-icons/fi';
+import { FiArrowLeft, FiCheck, FiX, FiDownload, FiGlobe, FiEdit2, FiChevronRight, FiSearch, FiCalendar } from 'react-icons/fi';
 import ComplianceScore from '../../components/compliance/ComplianceScore';
 import ComplianceChecklist from '../../components/compliance/ComplianceChecklist';
 import AISuggestions from '../../components/compliance/AISuggestions';
 import RuleViolationCard from '../../components/compliance/RuleViolationCard';
 import { StatusBadge, RiskBadge } from '../../components/common/Badge';
 import Button from '../../components/common/Button';
+import DateFilter from '../../components/common/DateFilter';
+import { SkeletonTable } from '../../components/common/Loader';
 import { getProducts } from '../../services/productService';
 import { analyzeProduct } from '../../services/aiService';
 import { approveProduct, rejectProduct } from '../../services/approvalService';
 import { publishProduct } from '../../services/productService';
-import { formatCurrency } from '../../utils/helpers';
+import { formatCurrency, formatDate, isInDateRange } from '../../utils/helpers';
 
 const DECISION_CONFIG = {
   approve: { status: 'approved', run: approveProduct, message: 'Product approved.' },
@@ -83,6 +85,19 @@ export default function ComplianceReport() {
   const [decision, setDecision] = useState(null);
   const [submitting, setSubmitting] = useState(null);
   const [publishing, setPublishing] = useState(false);
+  const [dateFilter, setDateFilter] = useState('all');
+  const [search, setSearch] = useState('');
+
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchesDate   = isInDateRange(p.createdAt, dateFilter);
+      const matchesSearch = !search.trim() ||
+        p.name?.toLowerCase().includes(search.toLowerCase()) ||
+        p.brand?.toLowerCase().includes(search.toLowerCase()) ||
+        p.category?.toLowerCase().includes(search.toLowerCase());
+      return matchesDate && matchesSearch;
+    });
+  }, [products, dateFilter, search]);
 
   useEffect(() => {
     const init = async () => {
@@ -145,41 +160,96 @@ export default function ComplianceReport() {
   // ── List view ───────────────────────────────────────────────────────────
   if (!product) {
     return (
-      <div className="max-w-5xl mx-auto space-y-6">
+      <div className="max-w-5xl mx-auto space-y-5">
+        {/* Header */}
         <div>
           <h1 className="text-2xl font-700 text-gray-900">Compliance Reports</h1>
           <p className="text-sm text-gray-500 mt-0.5">Select a product to view its detailed compliance report</p>
         </div>
 
+        {/* Filter bar */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Search */}
+          <div className="relative flex-1 min-w-[200px]">
+            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <input
+              type="text"
+              placeholder="Search by name, brand or category…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-teal-600"
+            />
+          </div>
+          <DateFilter value={dateFilter} onChange={setDateFilter} />
+          <span className="text-xs text-gray-400 ml-auto">
+            {filteredProducts.length} of {products.length} reports
+          </span>
+        </div>
+
         {listLoading ? (
-          <div className="flex justify-center py-16"><Spinner label="Loading products…" /></div>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <SkeletonTable rows={7} />
+          </div>
         ) : products.length === 0 ? (
           <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-sm text-gray-400">
             No products yet. Add one to generate a compliance report.
           </div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center text-sm text-gray-400">
+            No reports match your filters.
+          </div>
         ) : (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm divide-y divide-gray-100 overflow-hidden">
-            {products.map((p, i) => (
-              <motion.button
-                key={p.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(i * 0.03, 0.3) }}
-                onClick={() => openReport(p)}
-                className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors text-left"
-              >
-                <MiniScore score={p.complianceScore ?? 0} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-600 text-gray-900 truncate">{p.name}</p>
-                  <p className="text-xs text-gray-500">{p.brand} · {p.category}</p>
-                </div>
-                <div className="hidden sm:flex items-center gap-2">
-                  <StatusBadge status={p.status} />
-                  <RiskBadge risk={p.riskLevel} />
-                </div>
-                <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
-              </motion.button>
-            ))}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Column headers — desktop only, same flex structure as rows */}
+            <div className="hidden sm:flex items-center gap-4 px-4 py-2.5 border-b border-gray-100 bg-gray-50">
+              <span style={{ width: 46, flexShrink: 0 }} />
+              <span className="flex-1 text-xs font-600 text-gray-500 uppercase tracking-wide">Product</span>
+              <span style={{ width: 104, flexShrink: 0 }} className="text-xs font-600 text-gray-500 uppercase tracking-wide">Date</span>
+              <span style={{ width: 90, flexShrink: 0 }} className="text-xs font-600 text-gray-500 uppercase tracking-wide">Status</span>
+              <span style={{ width: 64, flexShrink: 0 }} className="text-xs font-600 text-gray-500 uppercase tracking-wide">Risk</span>
+              <span style={{ width: 16, flexShrink: 0 }} />
+            </div>
+
+            <div className="divide-y divide-gray-100">
+              {filteredProducts.map((p, i) => (
+                <motion.button
+                  key={p.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i * 0.03, 0.2) }}
+                  onClick={() => openReport(p)}
+                  className="w-full flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div style={{ width: 46, flexShrink: 0 }}>
+                    <MiniScore score={p.complianceScore ?? 0} />
+                  </div>
+
+                  {/* Name + brand */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-600 text-gray-900 truncate">{p.name}</p>
+                    <p className="text-xs text-gray-500">{p.brand} · {p.category}</p>
+                  </div>
+
+                  {/* Date — desktop only */}
+                  <div className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500" style={{ width: 104, flexShrink: 0 }}>
+                    <FiCalendar className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+                    <span className="truncate">{p.createdAt ? formatDate(p.createdAt) : '—'}</span>
+                  </div>
+
+                  {/* Status badge — desktop only */}
+                  <div className="hidden sm:flex" style={{ width: 90, flexShrink: 0 }}>
+                    <StatusBadge status={p.status} />
+                  </div>
+
+                  {/* Risk badge — desktop only */}
+                  <div className="hidden sm:flex" style={{ width: 64, flexShrink: 0 }}>
+                    <RiskBadge risk={p.riskLevel} />
+                  </div>
+
+                  <FiChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                </motion.button>
+              ))}
+            </div>
           </div>
         )}
       </div>

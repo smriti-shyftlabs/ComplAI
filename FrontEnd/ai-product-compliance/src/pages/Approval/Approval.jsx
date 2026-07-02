@@ -5,47 +5,62 @@ import ApprovalCard from '../../components/approval/ApprovalCard';
 import ReviewerPanel from '../../components/approval/ReviewerPanel';
 import ApprovalHistory from '../../components/approval/ApprovalHistory';
 import Button from '../../components/common/Button';
+import DateFilter from '../../components/common/DateFilter';
+import { SkeletonCard } from '../../components/common/Loader';
 import { StatusBadge, RiskBadge } from '../../components/common/Badge';
 import { useProducts } from '../../hooks/useProducts';
 import { approveProduct, rejectProduct } from '../../services/approvalService';
+import { isInDateRange } from '../../utils/helpers';
+import { useToast } from '../../context/ToastContext';
 
 const PUBLISH_MIN_SCORE = 75;
 
 export default function Approval() {
   const { products, loading, updateProduct, publishProduct } = useProducts();
+  const { showToast } = useToast();
   const [riskFilter, setRiskFilter] = useState('all');
+  const [dateFilter, setDateFilter] = useState('all');
   const [tab, setTab] = useState('queue');
   const [publishingId, setPublishingId] = useState(null);
 
-  const pending = products.filter(p => p.status === 'pending');
+  const pending  = products.filter(p => p.status === 'pending');
   const approved = products.filter(p => p.status === 'approved');
-  const filtered = riskFilter === 'all' ? pending : pending.filter(p => p.riskLevel === riskFilter);
+  const filtered = pending
+    .filter(p => riskFilter === 'all' || p.riskLevel === riskFilter)
+    .filter(p => isInDateRange(p.createdAt, dateFilter));
 
   const handleApprove = async (id, comment) => {
     await approveProduct(id, comment);
     updateProduct(id, { status: 'approved', reviewComment: comment });
+    const name = products.find(p => p.id === id)?.name || 'Product';
+    showToast(`${name} approved successfully`, 'success');
   };
 
   const handleReject = async (id, comment) => {
     await rejectProduct(id, comment);
     updateProduct(id, { status: 'rejected', reviewComment: comment });
+    const name = products.find(p => p.id === id)?.name || 'Product';
+    showToast(`${name} rejected`, 'error');
   };
 
   const handlePublish = async (id) => {
     setPublishingId(id);
+    const name = products.find(p => p.id === id)?.name || 'Product';
     try {
       await publishProduct(id);
+      showToast(`${name} published to marketplace`, 'success');
     } catch (err) {
       console.error('Publish failed:', err);
+      showToast('Publish failed — please try again', 'error');
     } finally {
       setPublishingId(null);
     }
   };
 
   const tabs = [
-    { key: 'queue', label: `Pending Queue (${pending.length})` },
-    { key: 'approved', label: `Approved (${approved.length})` },
-    { key: 'history', label: 'Approval History' },
+    { key: 'queue',    label: `Pending Queue (${pending.length})` },
+    { key: 'approved', label: `Approved (${approved.length})`     },
+    { key: 'history',  label: 'Approval History'                  },
   ];
 
   return (
@@ -73,23 +88,28 @@ export default function Approval() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Queue */}
           <div className="lg:col-span-2 space-y-4">
-            {/* Filter */}
-            <div className="flex items-center gap-2">
-              <FiFilter className="w-4 h-4 text-gray-400" />
-              <span className="text-sm text-gray-600 mr-1">Risk:</span>
-              {['all', 'high', 'medium', 'low'].map(r => (
-                <button
-                  key={r}
-                  onClick={() => setRiskFilter(r)}
-                  className={`text-xs px-3 py-1.5 rounded-full border font-500 capitalize transition-all ${riskFilter === r ? 'bg-teal-700 text-white border-teal-700' : 'text-gray-600 border-gray-200 hover:border-gray-300'}`}
-                >
-                  {r === 'all' ? 'All' : `${r} risk`}
-                </button>
-              ))}
+            {/* Filters */}
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2">
+                <FiFilter className="w-4 h-4 text-gray-400" />
+                <span className="text-sm text-gray-600">Risk:</span>
+                {['all', 'high', 'medium', 'low'].map(r => (
+                  <button
+                    key={r}
+                    onClick={() => setRiskFilter(r)}
+                    className={`text-xs px-3 py-1.5 rounded-full border font-500 capitalize transition-all ${riskFilter === r ? 'bg-teal-700 text-white border-teal-700' : 'text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                  >
+                    {r === 'all' ? 'All' : `${r} risk`}
+                  </button>
+                ))}
+              </div>
+              <DateFilter value={dateFilter} onChange={setDateFilter} className="ml-auto" />
             </div>
 
             {loading ? (
-              <div className="text-center py-12 text-gray-400">Loading...</div>
+              <div className="space-y-4">
+                {[1, 2, 3].map(n => <SkeletonCard key={n} />)}
+              </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
                 <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
@@ -121,7 +141,9 @@ export default function Approval() {
       {tab === 'approved' && (
         <div className="space-y-4">
           {loading ? (
-            <div className="text-center py-12 text-gray-400">Loading...</div>
+            <div className="space-y-4">
+              {[1, 2].map(n => <SkeletonCard key={n} />)}
+            </div>
           ) : approved.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
               <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">

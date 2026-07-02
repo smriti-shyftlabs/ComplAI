@@ -8,9 +8,9 @@ const ROLES = ['Admin', 'Senior Reviewer', 'Compliance Analyst', 'Junior Reviewe
 const DEPARTMENTS = ['Compliance', 'Platform', 'Legal', 'Operations', 'Quality Assurance'];
 
 const inputCls =
-  'w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50/60 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white transition';
+  'w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50/60 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent focus:bg-white transition';
 const selectCls =
-  'w-full h-11 px-3 rounded-xl border border-slate-200 bg-slate-50/60 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white transition';
+  'w-full h-11 px-3 rounded-xl border border-slate-200 bg-slate-50/60 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent focus:bg-white transition';
 
 export default function Register({ onSwitchToLogin }) {
   const { register, authLoading, authError } = useAuth();
@@ -160,7 +160,8 @@ export default function Register({ onSwitchToLogin }) {
         <button
           type="submit"
           disabled={authLoading}
-          className="w-full h-11 bg-gradient-to-r from-violet-600 to-teal-700 hover:from-violet-700 hover:to-teal-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-indigo-600/25 mt-1"
+          className="w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 mt-1"
+          style={{ background: 'linear-gradient(135deg, #155E56 0%, #2BA090 100%)', boxShadow: '0 4px 14px rgba(21,94,86,0.35)' }}
         >
           {authLoading ? (
             <>
@@ -176,7 +177,7 @@ export default function Register({ onSwitchToLogin }) {
 
       <p className="text-center text-sm text-slate-500 mt-5">
         Already have an account?{' '}
-        <button onClick={onSwitchToLogin} className="text-indigo-600 font-semibold hover:underline">
+        <button onClick={onSwitchToLogin} className="text-teal-700 font-semibold hover:underline">
           Sign in
         </button>
       </p>

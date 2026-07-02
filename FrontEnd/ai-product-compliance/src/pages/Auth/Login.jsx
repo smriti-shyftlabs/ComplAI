@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiUser } from 'react-icons/fi';
+import { FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
 
 const inputCls =
-  'w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50/60 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent focus:bg-white transition';
+  'w-full h-11 pl-10 pr-4 rounded-xl border border-slate-200 bg-slate-50/60 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:border-transparent focus:bg-white transition';
 
 export default function Login({ onSwitchToRegister }) {
   const { login, authLoading, authError } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [localError, setLocalError] = useState('');
@@ -26,12 +28,12 @@ export default function Login({ onSwitchToRegister }) {
     }
     try {
       await login(form.email, form.password);
+      navigate('/', { replace: true });
     } catch {
       // error shown via authError
     }
   };
 
-  const fillDemo = (email, password) => setForm({ email, password });
   const error = localError || authError;
 
   return (
@@ -100,7 +102,8 @@ export default function Login({ onSwitchToRegister }) {
         <button
           type="submit"
           disabled={authLoading}
-          className="w-full h-11 bg-gradient-to-r from-violet-600 to-teal-700 hover:from-violet-700 hover:to-teal-800 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md shadow-indigo-600/25"
+          className="w-full h-11 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+          style={{ background: 'linear-gradient(135deg, #155E56 0%, #2BA090 100%)', boxShadow: '0 4px 14px rgba(21,94,86,0.35)' }}
         >
           {authLoading ? (
             <>
@@ -114,39 +117,9 @@ export default function Login({ onSwitchToRegister }) {
         </button>
       </form>
 
-      {/* Demo accounts */}
-      <div className="mt-7">
-        <div className="flex items-center gap-3 mb-3">
-          <span className="h-px flex-1 bg-slate-200" />
-          <span className="text-xs text-slate-400">Demo accounts</span>
-          <span className="h-px flex-1 bg-slate-200" />
-        </div>
-        <div className="grid grid-cols-2 gap-2.5">
-          {[
-            { label: 'Sneha', email: 'sneha@shyftlabs.io', password: 'admin@123', tint: 'bg-violet-50 hover:bg-violet-100/70 ring-violet-100', name: 'text-violet-700', avatar: 'bg-violet-100 text-violet-600' },
-            { label: 'Smriti', email: 'smriti@shyftlabs.io', password: 'complai123', tint: 'bg-teal-50 hover:bg-teal-100/70 ring-teal-100', name: 'text-teal-800', avatar: 'bg-teal-100 text-teal-700' },
-          ].map(acc => (
-            <button
-              key={acc.label}
-              type="button"
-              onClick={() => fillDemo(acc.email, acc.password)}
-              className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl ring-1 transition-colors text-left ${acc.tint}`}
-            >
-              <span className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${acc.avatar}`}>
-                <FiUser className="w-3.5 h-3.5" />
-              </span>
-              <span className="min-w-0">
-                <span className={`block text-xs font-semibold ${acc.name}`}>{acc.label}</span>
-                <span className="block text-[11px] text-slate-400 truncate">{acc.email}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-
       <p className="text-center text-sm text-slate-500 mt-6">
         No account?{' '}
-        <button onClick={onSwitchToRegister} className="text-indigo-600 font-semibold hover:underline">
+        <button onClick={onSwitchToRegister} className="text-teal-700 font-semibold hover:underline">
           Create one
         </button>
       </p>

@@ -1,4 +1,6 @@
 import { useState, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
@@ -7,8 +9,9 @@ import CommandPalette from '../components/common/CommandPalette';
 
 export default function MainLayout({ children }) {
   const { isDark } = useTheme();
-  const [sidebarOpen, setSidebarOpen] = useState(false);   // mobile
-  const [sidebarExpanded, setSidebarExpanded] = useState(true); // desktop hover state
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const collapseTimer = useRef(null);
 
   const handleSidebarEnter = () => {
@@ -48,10 +51,20 @@ export default function MainLayout({ children }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Navbar onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-4 sm:p-6 lg:p-8 min-h-full">
-            {children}
-          </div>
+        <main className="flex-1 overflow-hidden relative">
+          <AnimatePresence initial={false}>
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, transition: { duration: 0.06 } }}
+              transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+              style={{ position: 'absolute', inset: 0, overflowY: 'auto' }}
+              className="p-4 sm:p-6 lg:p-8"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 
