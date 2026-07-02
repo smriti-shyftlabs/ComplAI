@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTheme } from '../../context/ThemeContext';
 
 const variantStyles = {
   primary: 'text-white border-transparent shadow-sm hover:shadow-md hover:opacity-90',
@@ -31,6 +32,7 @@ export default function Button({
   fullWidth = false,
   ...props
 }) {
+  const { isDark } = useTheme();
   const isDisabled = disabled || loading;
 
   return (
@@ -56,7 +58,9 @@ export default function Button({
           : variant === 'ghost'
           ? { color: '#2BA090' }
           : variant === 'secondary'
-          ? { color: '#0C3530', borderColor: '#BDD8D3' }
+          ? isDark
+            ? { color: '#7EC8BE', borderColor: 'rgba(43,160,144,0.35)', backgroundColor: '#182E2B' }
+            : { color: '#0C3530', borderColor: '#BDD8D3' }
           : {}
       }
       {...props}
