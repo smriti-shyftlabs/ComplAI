@@ -10,6 +10,7 @@ import { SkeletonCard } from '../../components/common/Loader';
 import { StatusBadge, RiskBadge } from '../../components/common/Badge';
 import { useProducts } from '../../hooks/useProducts';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { approveProduct, rejectProduct } from '../../services/approvalService';
 import { getPublishHistory } from '../../services/productService';
 import { isInDateRange } from '../../utils/helpers';
@@ -27,6 +28,7 @@ function formatDateTime(iso) {
 export default function Approval() {
   const { products, loading, updateProduct, publishProduct } = useProducts();
   const { currentUser } = useAuth();
+  const { isDark } = useTheme();
   const { showToast } = useToast();
   const [riskFilter, setRiskFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
@@ -35,10 +37,10 @@ export default function Approval() {
   const [marketplaceById, setMarketplaceById] = useState({});
   const [history, setHistory] = useState([]);
 
-  const pending = products.filter(p => p.status === 'pending');
-  const approved = products.filter(p => p.status === 'approved');
+  const pending   = products.filter(p => p.status === 'pending');
+  const approved  = products.filter(p => p.status === 'approved');
   const published = products.filter(p => p.status === 'published');
-  const filtered = pending
+  const filtered  = pending
     .filter(p => riskFilter === 'all' || p.riskLevel === riskFilter)
     .filter(p => isInDateRange(p.createdAt, dateFilter));
 
@@ -50,99 +52,160 @@ export default function Approval() {
   const handleApprove = async (id, comment) => {
     await approveProduct(id, comment);
     updateProduct(id, { status: 'approved', reviewComment: comment });
-    const name = products.find(p => p.id === id)?.name || 'Product';
-    showToast(`${name} approved successfully`, 'success');
+    showToast(`${products.find(p => p.id === id)?.name || 'Product'} approved successfully`, 'success');
   };
 
   const handleReject = async (id, comment) => {
     await rejectProduct(id, comment);
     updateProduct(id, { status: 'rejected', reviewComment: comment });
-    const name = products.find(p => p.id === id)?.name || 'Product';
-    showToast(`${name} rejected`, 'error');
+    showToast(`${products.find(p => p.id === id)?.name || 'Product'} rejected`, 'error');
   };
 
   const handlePublish = async (product) => {
     const marketplace = marketplaceById[product.id] || MARKETPLACES[0];
     setPublishingId(product.id);
     try {
-      await publishProduct(product.id, {
-        publishedBy: currentUser?.name || 'Admin User',
-        marketplace,
-      });
-      loadHistory();   // refresh the publish-history log immediately
+      await publishProduct(product.id, { publishedBy: currentUser?.name || 'Admin User', marketplace });
+      loadHistory();
       showToast(`${product.name} published to ${marketplace}`, 'success');
-    } catch (err) {
-      console.error('Publish failed:', err);
+    } catch {
       showToast('Publish failed — please try again', 'error');
     } finally {
       setPublishingId(null);
     }
   };
 
+  // ── colour tokens ─────────────────────────────────────────────────────────
+  const cardBg      = isDark ? '#141414' : '#FFFFFF';
+  const cardBorder  = isDark ? 'rgba(255,255,255,0.07)' : '#E5E7EB';
+  const divider     = isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9';
+  const textPri     = isDark ? '#FAFAFA' : '#111827';
+  const textSec     = isDark ? '#A3A3A3' : '#6B7280';
+  const textMut     = isDark ? '#525252' : '#9CA3AF';
+  const tabBarBg    = isDark ? '#1A1A1A' : '#F3F4F6';
+  const tabBarBord  = isDark ? 'rgba(255,255,255,0.06)' : 'transparent';
+  const activeTabBg = isDark ? '#2A2A2A' : '#FFFFFF';
+  const rowHoverBg  = isDark ? 'rgba(255,255,255,0.03)' : '#F9FAFB';
+
   const tabs = [
-    { key: 'queue', label: `Pending Queue (${pending.length})` },
-    { key: 'approved', label: `Approved (${approved.length})` },
-    { key: 'published', label: `Published (${published.length})` },
+    { key: 'queue',          label: `Pending Queue (${pending.length})` },
+    { key: 'approved',       label: `Approved (${approved.length})` },
+    { key: 'published',      label: `Published (${published.length})` },
     { key: 'publishHistory', label: 'Publish History' },
-    { key: 'history', label: 'Approval History' },
+    { key: 'history',        label: 'Approval History' },
   ];
+
+  // ── shared empty-state ────────────────────────────────────────────────────
+  const EmptyState = ({ icon: Icon, iconBg, iconColor, title, sub }) => (
+    <div style={{
+      textAlign: 'center', padding: '64px 24px',
+      background: cardBg, border: `1px solid ${cardBorder}`,
+      borderRadius: 12,
+    }}>
+      <div style={{
+        width: 64, height: 64, borderRadius: '50%',
+        background: iconBg, display: 'flex', alignItems: 'center',
+        justifyContent: 'center', margin: '0 auto 16px',
+      }}>
+        <Icon style={{ width: 28, height: 28, color: iconColor }} />
+      </div>
+      <p style={{ fontSize: 14, fontWeight: 600, color: textPri, margin: 0 }}>{title}</p>
+      <p style={{ fontSize: 13, color: textMut, marginTop: 4 }}>{sub}</p>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-700 text-gray-900">Products</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Review, approve, and publish product submissions</p>
+        <h1 style={{ fontSize: 22, fontWeight: 700, color: textPri, margin: 0 }}>Products</h1>
+        <p style={{ fontSize: 13, color: textSec, marginTop: 2 }}>Review, approve, and publish product submissions</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-1 p-1 bg-gray-100 rounded-xl w-fit flex-wrap">
+      {/* ── Tab bar — full width so no empty space above ReviewerPanel ── */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+        padding: 4,
+        background: tabBarBg,
+        border: `1px solid ${tabBarBord}`,
+        borderRadius: 12,
+        overflowX: 'auto',
+      }}>
         {tabs.map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-500 transition-all ${tab === t.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+            style={{
+              flex: 1,
+              padding: '8px 12px',
+              borderRadius: 8,
+              fontSize: 13,
+              fontWeight: 500,
+              cursor: 'pointer',
+              border: 'none',
+              whiteSpace: 'nowrap',
+              textAlign: 'center',
+              transition: 'background 0.15s, color 0.15s, box-shadow 0.15s',
+              background: tab === t.key ? activeTabBg : 'transparent',
+              color: tab === t.key ? textPri : textSec,
+              boxShadow: tab === t.key
+                ? (isDark ? '0 1px 4px rgba(0,0,0,0.5)' : '0 1px 3px rgba(0,0,0,0.1)')
+                : 'none',
+            }}
           >
             {t.label}
           </button>
         ))}
       </div>
 
+      {/* ── PENDING QUEUE ─────────────────────────────────────────────────── */}
       {tab === 'queue' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
             {/* Filters */}
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="flex items-center gap-2">
-                <FiFilter className="w-4 h-4 text-gray-400" />
-                <span className="text-sm text-gray-600">Risk:</span>
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <FiFilter style={{ width: 15, height: 15, color: textMut }} />
+                <span style={{ fontSize: 13, color: textSec }}>Risk:</span>
                 {['all', 'high', 'medium', 'low'].map(r => (
                   <button
                     key={r}
                     onClick={() => setRiskFilter(r)}
-                    className={`text-xs px-3 py-1.5 rounded-full border font-500 capitalize transition-all ${riskFilter === r ? 'bg-teal-700 text-white border-teal-700' : 'text-gray-600 border-gray-200 hover:border-gray-300'}`}
+                    style={{
+                      fontSize: 12, padding: '5px 12px',
+                      borderRadius: 9999, fontWeight: 500,
+                      cursor: 'pointer', textTransform: 'capitalize',
+                      transition: 'all 0.15s',
+                      background: riskFilter === r ? '#2BA090' : 'transparent',
+                      color: riskFilter === r ? '#FFFFFF' : textSec,
+                      border: `1px solid ${riskFilter === r ? '#2BA090' : cardBorder}`,
+                    }}
                   >
                     {r === 'all' ? 'All' : `${r} risk`}
                   </button>
                 ))}
               </div>
-              <DateFilter value={dateFilter} onChange={setDateFilter} className="ml-auto" />
+              <div style={{ marginLeft: 'auto' }}>
+                <DateFilter value={dateFilter} onChange={setDateFilter} />
+              </div>
             </div>
 
             {loading ? (
-              <div className="space-y-4">
-                {[1, 2, 3].map(n => <SkeletonCard key={n} />)}
-              </div>
+              <div className="space-y-4">{[1,2,3].map(n => <SkeletonCard key={n} />)}</div>
             ) : filtered.length === 0 ? (
-              <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-                <div className="w-16 h-16 rounded-full bg-teal-100 flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-teal-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <EmptyState
+                icon={({ style }) => (
+                  <svg style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                </div>
-                <p className="text-gray-600 font-600">No pending products</p>
-                <p className="text-sm text-gray-400 mt-1">All products have been reviewed</p>
-              </div>
+                )}
+                iconBg={isDark ? 'rgba(43,160,144,0.12)' : '#ECFDF5'}
+                iconColor="#2BA090"
+                title="No pending products"
+                sub="All products have been reviewed"
+              />
             ) : (
               filtered.map((product, i) => (
                 <ApprovalCard
@@ -161,20 +224,19 @@ export default function Approval() {
         </div>
       )}
 
+      {/* ── APPROVED ──────────────────────────────────────────────────────── */}
       {tab === 'approved' && (
         <div className="space-y-4">
           {loading ? (
-            <div className="space-y-4">
-              {[1, 2].map(n => <SkeletonCard key={n} />)}
-            </div>
+            <div className="space-y-4">{[1,2].map(n => <SkeletonCard key={n} />)}</div>
           ) : approved.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-              <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                <FiCheckCircle className="w-8 h-8 text-blue-600" />
-              </div>
-              <p className="text-gray-600 font-600">No approved products awaiting publish</p>
-              <p className="text-sm text-gray-400 mt-1">Approve products from the Pending Queue first</p>
-            </div>
+            <EmptyState
+              icon={FiCheckCircle}
+              iconBg={isDark ? 'rgba(59,130,246,0.12)' : '#EFF6FF'}
+              iconColor="#3B82F6"
+              title="No approved products awaiting publish"
+              sub="Approve products from the Pending Queue first"
+            />
           ) : (
             approved.map((product, i) => {
               const canPublish = (product.complianceScore ?? 0) >= PUBLISH_MIN_SCORE;
@@ -184,33 +246,53 @@ export default function Approval() {
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-center justify-between flex-wrap gap-4"
+                  style={{
+                    background: cardBg,
+                    border: `1px solid ${cardBorder}`,
+                    borderRadius: 12,
+                    boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.06)',
+                    padding: '20px 24px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: 16,
+                  }}
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-base font-600 text-gray-900">{product.name}</h3>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                      <h3 style={{ fontSize: 15, fontWeight: 600, color: textPri, margin: 0 }}>{product.name}</h3>
                       <StatusBadge status={product.status} />
                       <RiskBadge risk={product.riskLevel} />
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {product.brand} · {product.category} · Compliance score{' '}
-                      <span className={`font-600 ${canPublish ? 'text-green-600' : 'text-yellow-600'}`}>
+                    <p style={{ fontSize: 13, color: textSec, marginTop: 4 }}>
+                      {product.brand} · {product.category} · Score{' '}
+                      <span style={{ fontWeight: 600, color: canPublish ? '#10B981' : '#F59E0B' }}>
                         {product.complianceScore ?? 0}
                       </span>
                     </p>
                   </div>
-                  <div className="flex items-end gap-2">
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10 }}>
                     <div>
-                      <label className="block text-[11px] text-gray-400 mb-1">Marketplace</label>
+                      <label style={{ display: 'block', fontSize: 11, color: textMut, marginBottom: 4 }}>Marketplace</label>
                       <select
                         value={marketplaceById[product.id] || MARKETPLACES[0]}
                         onChange={e => setMarketplaceById(m => ({ ...m, [product.id]: e.target.value }))}
-                        className="border border-gray-300 rounded-lg px-2 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-600"
+                        style={{
+                          border: `1px solid ${cardBorder}`,
+                          borderRadius: 8,
+                          padding: '7px 10px',
+                          fontSize: 13,
+                          background: isDark ? '#1A1A1A' : '#FFFFFF',
+                          color: textPri,
+                          outline: 'none',
+                          cursor: 'pointer',
+                        }}
                       >
                         {MARKETPLACES.map(m => <option key={m} value={m}>{m}</option>)}
                       </select>
                     </div>
-                    <div className="flex flex-col items-end gap-1">
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 4 }}>
                       <Button
                         variant="success"
                         size="sm"
@@ -222,7 +304,7 @@ export default function Approval() {
                         Publish to Marketplace
                       </Button>
                       {!canPublish && (
-                        <span className="text-xs text-yellow-600">Needs score {PUBLISH_MIN_SCORE}+ to publish</span>
+                        <span style={{ fontSize: 11, color: '#F59E0B' }}>Needs score {PUBLISH_MIN_SCORE}+ to publish</span>
                       )}
                     </div>
                   </div>
@@ -233,18 +315,19 @@ export default function Approval() {
         </div>
       )}
 
+      {/* ── PUBLISHED ─────────────────────────────────────────────────────── */}
       {tab === 'published' && (
         <div className="space-y-4">
           {loading ? (
-            <div className="space-y-4">{[1, 2].map(n => <SkeletonCard key={n} />)}</div>
+            <div className="space-y-4">{[1,2].map(n => <SkeletonCard key={n} />)}</div>
           ) : published.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-                <FiGlobe className="w-8 h-8 text-green-600" />
-              </div>
-              <p className="text-gray-600 font-600">No published products yet</p>
-              <p className="text-sm text-gray-400 mt-1">Publish an approved product to see it here</p>
-            </div>
+            <EmptyState
+              icon={FiGlobe}
+              iconBg={isDark ? 'rgba(16,185,129,0.12)' : '#ECFDF5'}
+              iconColor="#10B981"
+              title="No published products yet"
+              sub="Publish an approved product to see it here"
+            />
           ) : (
             published.map((product, i) => (
               <motion.div
@@ -252,22 +335,35 @@ export default function Approval() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
-                className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-center justify-between flex-wrap gap-4"
+                style={{
+                  background: cardBg,
+                  border: `1px solid ${cardBorder}`,
+                  borderRadius: 12,
+                  boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.06)',
+                  padding: '20px 24px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: 16,
+                }}
               >
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-base font-600 text-gray-900">{product.name}</h3>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: textPri, margin: 0 }}>{product.name}</h3>
                     <StatusBadge status={product.status} />
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p style={{ fontSize: 13, color: textSec, marginTop: 4 }}>
                     {product.brand} · {product.category}
-                    {product.marketplace ? <> · <span className="text-gray-700 font-500">{product.marketplace}</span></> : null}
+                    {product.marketplace ? <> · <span style={{ fontWeight: 500, color: textPri }}>{product.marketplace}</span></> : null}
                     {product.publishVersion ? ` · v${product.publishVersion}` : null}
                   </p>
                 </div>
-                <div className="text-right text-xs text-gray-500">
-                  <p>Published by <span className="font-500 text-gray-700">{product.publishedBy || '—'}</span></p>
-                  <p className="mt-0.5">{formatDateTime(product.publishedAt)}</p>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: 12, color: textSec }}>
+                    Published by <span style={{ fontWeight: 500, color: textPri }}>{product.publishedBy || '—'}</span>
+                  </p>
+                  <p style={{ fontSize: 12, color: textMut, marginTop: 2 }}>{formatDateTime(product.publishedAt)}</p>
                 </div>
               </motion.div>
             ))
@@ -275,37 +371,55 @@ export default function Approval() {
         </div>
       )}
 
+      {/* ── PUBLISH HISTORY ───────────────────────────────────────────────── */}
       {tab === 'publishHistory' && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-6">
-          <h3 className="text-sm font-600 text-gray-900 mb-4">Publish History</h3>
+        <div style={{
+          background: cardBg,
+          border: `1px solid ${cardBorder}`,
+          borderRadius: 12,
+          boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.06)',
+          overflow: 'hidden',
+        }}>
+          <div style={{ padding: '16px 24px', borderBottom: `1px solid ${divider}` }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: textPri, margin: 0 }}>Publish History</h3>
+          </div>
           {history.length === 0 ? (
-            <p className="text-sm text-gray-400 py-8 text-center">No publish activity recorded yet.</p>
+            <p style={{ fontSize: 13, color: textMut, padding: '48px 24px', textAlign: 'center' }}>
+              No publish activity recorded yet.
+            </p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
-                  <tr className="text-left text-xs text-gray-400 border-b border-gray-100">
-                    <th className="py-2 pr-4 font-500">Product</th>
-                    <th className="py-2 pr-4 font-500">SKU</th>
-                    <th className="py-2 pr-4 font-500">Category</th>
-                    <th className="py-2 pr-4 font-500">Marketplace</th>
-                    <th className="py-2 pr-4 font-500">Published By</th>
-                    <th className="py-2 pr-4 font-500">Date &amp; Time</th>
-                    <th className="py-2 pr-4 font-500">Version</th>
-                    <th className="py-2 font-500">Status</th>
+                  <tr style={{ background: isDark ? '#1A1A1A' : '#F9FAFB' }}>
+                    {['Product','SKU','Category','Marketplace','Published By','Date & Time','Version','Status'].map(h => (
+                      <th key={h} style={{
+                        textAlign: 'left', fontSize: 11, fontWeight: 600,
+                        color: textMut, textTransform: 'uppercase', letterSpacing: '0.06em',
+                        padding: '10px 16px',
+                        borderBottom: `1px solid ${divider}`,
+                        whiteSpace: 'nowrap',
+                      }}>{h}</th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {history.map(h => (
-                    <tr key={h.id} className="border-b border-gray-50">
-                      <td className="py-2.5 pr-4 font-500 text-gray-900">{h.productName}</td>
-                      <td className="py-2.5 pr-4 text-gray-600">{h.sku || '—'}</td>
-                      <td className="py-2.5 pr-4 text-gray-600">{h.category}</td>
-                      <td className="py-2.5 pr-4 text-gray-700">{h.marketplace}</td>
-                      <td className="py-2.5 pr-4 text-gray-600">{h.publishedBy}</td>
-                      <td className="py-2.5 pr-4 text-gray-600 whitespace-nowrap">{formatDateTime(h.publishedAt)}</td>
-                      <td className="py-2.5 pr-4 text-gray-600">v{h.version}</td>
-                      <td className="py-2.5"><StatusBadge status={h.status} /></td>
+                  {history.map((h, i) => (
+                    <tr
+                      key={h.id}
+                      style={{
+                        borderBottom: `1px solid ${divider}`,
+                        background: i % 2 === 0 ? 'transparent' : (isDark ? 'rgba(255,255,255,0.015)' : 'rgba(0,0,0,0.01)'),
+                      }}
+                    >
+                      <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, color: textPri }}>{h.productName}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: textSec }}>{h.sku || '—'}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: textSec }}>{h.category}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: textPri, fontWeight: 500 }}>{h.marketplace}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: textSec }}>{h.publishedBy}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 12, color: textMut, whiteSpace: 'nowrap' }}>{formatDateTime(h.publishedAt)}</td>
+                      <td style={{ padding: '12px 16px', fontSize: 13, color: textSec }}>v{h.version}</td>
+                      <td style={{ padding: '12px 16px' }}><StatusBadge status={h.status} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -315,10 +429,21 @@ export default function Approval() {
         </div>
       )}
 
+      {/* ── APPROVAL HISTORY ──────────────────────────────────────────────── */}
       {tab === 'history' && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 sm:p-6">
-          <h3 className="text-sm font-600 text-gray-900 mb-4">Approval History</h3>
-          <ApprovalHistory />
+        <div style={{
+          background: cardBg,
+          border: `1px solid ${cardBorder}`,
+          borderRadius: 12,
+          boxShadow: isDark ? '0 1px 3px rgba(0,0,0,0.4)' : '0 1px 3px rgba(0,0,0,0.06)',
+          overflow: 'hidden',
+        }}>
+          <div style={{ padding: '16px 24px', borderBottom: `1px solid ${divider}` }}>
+            <h3 style={{ fontSize: 14, fontWeight: 600, color: textPri, margin: 0 }}>Approval History</h3>
+          </div>
+          <div style={{ padding: '20px 24px' }}>
+            <ApprovalHistory />
+          </div>
         </div>
       )}
     </div>
