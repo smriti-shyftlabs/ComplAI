@@ -31,4 +31,6 @@ export const updateProduct = (id, patch) => api.patch(`/products/${id}`, patch);
 
 export const deleteProduct = (id) => api.del(`/products/${id}`);
 
-export const publishProduct = (id) => api.post(`/products/${id}/publish`);
+export const publishProduct = (id, meta = {}) => api.post(`/products/${id}/publish`, meta);
+
+export const getPublishHistory = () => api.get('/products/publish-history');

@@ -25,6 +25,7 @@ export const Notifications = () => collection('notifications', { idPrefix: 'NOTI
 export const Users         = () => collection('users', { idPrefix: 'USR' });
 export const Reports       = () => collection('complianceReports', { idPrefix: 'RPT' });
 export const Settings      = () => collection('settings', { idPrefix: 'CFG' });
+export const PublishHistory = () => collection('publishHistory', { idPrefix: 'PUB' });
 export const Emails        = () => collection('emails', { idPrefix: 'MAIL' });
 
 const SETTINGS_SEED = [
@@ -58,8 +59,8 @@ export function initDB() {
   seedIfEmpty(Notifications(), notifications);
   seedIfEmpty(Users(), reviewers);
   seedIfEmpty(Settings(), SETTINGS_SEED);
-  // approvals & complianceReports start empty
-  Approvals(); Reports();
+  // approvals, complianceReports & publishHistory start empty
+  Approvals(); Reports(); PublishHistory();
 
   const stats = {};
   for (const [name, col] of [['products', Products()], ['rules', Rules()],

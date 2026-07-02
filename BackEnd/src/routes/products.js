@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { Products, AuditLogs } from '../seed.js';
+import { Products, AuditLogs, PublishHistory } from '../seed.js';
 import { generateId, randomReviewer } from '../utils.js';
 import { sendPublishedEmail } from '../mailer.js';
 
@@ -39,6 +39,9 @@ router.get('/paginated', (req, res) => {
 router.get('/counts/status', (_req, res) => res.json(Products().groupCount('status')));
 router.get('/counts/category', (_req, res) => res.json(Products().groupCount('category')));
 router.get('/avg-score', (_req, res) => res.json({ average: Products().avg('complianceScore') }));
+
+// Read-only publish audit trail (most recent first).
+router.get('/publish-history', (_req, res) => res.json(PublishHistory().sort('publishedAt', 'desc')));
 
 router.get('/:id', (req, res) => {
   const p = Products().findById(req.params.id);
@@ -83,9 +86,31 @@ router.delete('/:id', (req, res) => {
 });
 
 router.post('/:id/publish', (req, res) => {
-  const updated = Products().update(req.params.id, { status: 'published', publishedAt: new Date().toISOString() });
-  if (!updated) return res.status(404).json({ error: `Product ${req.params.id} not found` });
-  auditLog(req.params.id, 'Published', randomReviewer(), 'Product published to marketplace');
+  const existing = Products().findById(req.params.id);
+  if (!existing) return res.status(404).json({ error: `Product ${req.params.id} not found` });
+
+  const publishedBy = (req.body?.publishedBy && String(req.body.publishedBy).trim()) || randomReviewer();
+  const marketplace = (req.body?.marketplace && String(req.body.marketplace).trim()) || 'Amazon';
+  const version = (existing.publishVersion || 0) + 1;
+  const publishedAt = new Date().toISOString();
+
+  const updated = Products().update(req.params.id, {
+    status: 'published', publishedAt, publishedBy, marketplace, publishVersion: version,
+  });
+
+  PublishHistory().insert({
+    id: generateId('PUB'),
+    productId: existing.id,
+    productName: existing.name,
+    sku: existing.sku || '',
+    category: existing.category,
+    marketplace,
+    publishedBy,
+    publishedAt,
+    status: 'published',
+    version,
+  });
+  auditLog(req.params.id, 'Published', publishedBy, `Published to ${marketplace} (v${version})`);
   // Notify the vendor their product is now live on the marketplace (fire-and-forget).
   sendPublishedEmail(updated).catch(() => {});
   res.json(updated);

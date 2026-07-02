@@ -55,9 +55,9 @@ export const useProducts = () => {
     }
   }, []);
 
-  const publishProduct = useCallback(async (id) => {
+  const publishProduct = useCallback(async (id, meta = {}) => {
     try {
-      const published = await productService.publishProduct(id);
+      const published = await productService.publishProduct(id, meta);
       setProducts(prev => prev.map(p => p.id === id ? published : p));
       return published;
     } catch (err) {

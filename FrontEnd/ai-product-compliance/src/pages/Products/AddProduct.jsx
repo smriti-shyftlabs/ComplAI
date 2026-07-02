@@ -2,8 +2,8 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  FiArrowLeft, FiZap, FiGlobe, FiCheckCircle, FiFileText,
-  FiRefreshCw, FiAlertTriangle, FiTrash2,
+  FiArrowLeft, FiZap, FiCheckCircle, FiFileText,
+  FiRefreshCw, FiAlertTriangle, FiTrash2, FiArrowRight,
 } from 'react-icons/fi';
 import ProductForm from '../../components/product/ProductForm';
 import ReadinessMeter from '../../components/product/ReadinessMeter';
@@ -12,9 +12,8 @@ import ComplianceScore from '../../components/compliance/ComplianceScore';
 import Button from '../../components/common/Button';
 import { useCompliance } from '../../hooks/useCompliance';
 import { useProducts } from '../../hooks/useProducts';
-import { publishProduct } from '../../services/productService';
 import { getCategoryDefaults, getCategoryFields } from '../../data/categorySchemas';
-import { computeReadiness, validateProduct, PUBLISH_THRESHOLD } from '../../utils/readiness';
+import { computeReadiness, validateProduct } from '../../utils/readiness';
 import { loadDraft, saveDraft, clearDraft, draftSignature } from '../../utils/productDraft';
 
 /** Assemble the flat form values into the product payload sent to the API. */
@@ -66,23 +65,17 @@ export default function AddProduct() {
   const [result, setResult] = useState(() => draft?.result || null);
   const [analyzedSignature, setAnalyzedSignature] = useState(() => draft?.analyzedSignature || null);
   const [analyzing, setAnalyzing] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [published, setPublished] = useState(() => draft?.published || false);
 
   const readiness = useMemo(() => computeReadiness(values.category, values), [values]);
   const signature = useMemo(() => draftSignature(values), [values]);
 
   const hasAnalysis = !!result;
   const outdated = hasAnalysis && analyzedSignature !== null && signature !== analyzedSignature;
-  // Publishing needs field readiness AND a passing compliance score (not RED, >= threshold).
-  const compliancePass = (result?.score ?? 0) >= PUBLISH_THRESHOLD && result?.status !== 'RED';
-  const canPublish = hasAnalysis && !outdated && readiness.score >= PUBLISH_THRESHOLD && compliancePass;
 
-  // Persist the draft on every change (clear it once published).
+  // Persist the draft on every change so it survives navigation + refresh.
   useEffect(() => {
-    if (published) { clearDraft(); return; }
     saveDraft({ values, product, result, analyzedSignature });
-  }, [values, product, result, analyzedSignature, published]);
+  }, [values, product, result, analyzedSignature]);
 
   const handleChange = (key, value) => {
     setValues(prev => {
@@ -119,19 +112,6 @@ export default function AddProduct() {
     }
   };
 
-  const handlePublish = async () => {
-    if (!product || !canPublish || publishing) return;
-    setPublishing(true);
-    try {
-      await publishProduct(product.id);
-      setPublished(true);
-    } catch (err) {
-      console.error('Publish failed:', err);
-    } finally {
-      setPublishing(false);
-    }
-  };
-
   const handleDiscard = () => {
     clearDraft();
     setValues(INITIAL_VALUES);
@@ -139,7 +119,6 @@ export default function AddProduct() {
     setProduct(null);
     setResult(null);
     setAnalyzedSignature(null);
-    setPublished(false);
   };
 
   const viewFullReport = () =>
@@ -164,10 +143,10 @@ export default function AddProduct() {
           <Button variant="ghost" size="sm" icon={FiArrowLeft} onClick={() => navigate(-1)} />
           <div>
             <h1 className="text-2xl font-700 text-gray-900">Add New Product</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Complete the details, run AI compliance analysis, then publish.</p>
+            <p className="text-sm text-gray-500 mt-0.5">Complete the details and run AI compliance analysis. Publishing happens from the Approval Queue.</p>
           </div>
         </div>
-        {hasDraft && !published && (
+        {hasDraft && (
           <Button variant="ghost" size="sm" icon={FiTrash2} onClick={handleDiscard}>Discard draft</Button>
         )}
       </div>
@@ -233,16 +212,7 @@ export default function AddProduct() {
             <ReadinessMeter readiness={readiness} />
 
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-3">
-              {published ? (
-                <>
-                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-100 rounded-lg">
-                    <FiGlobe className="w-4 h-4 text-green-600 flex-shrink-0" />
-                    <p className="text-sm font-500 text-green-800">Published to marketplace.</p>
-                  </div>
-                  <Button variant="secondary" fullWidth onClick={() => navigate('/published')}>View Published Products</Button>
-                  <Button variant="ghost" fullWidth onClick={handleDiscard}>Add Another Product</Button>
-                </>
-              ) : !hasAnalysis ? (
+              {!hasAnalysis ? (
                 <>
                   <Button variant="primary" fullWidth icon={FiZap}
                     disabled={!readiness.mandatoryComplete || !(values.vendorEmail || '').trim()}
@@ -260,28 +230,22 @@ export default function AddProduct() {
                     onClick={handleAnalyze}>
                     Re-run Compliance Analysis
                   </Button>
-                  <p className="text-xs text-yellow-600 text-center">Product changed — re-run required before publishing.</p>
+                  <p className="text-xs text-yellow-600 text-center">Product changed — re-run the analysis to update the report.</p>
                 </>
               ) : (
                 <>
-                  <Button variant="success" fullWidth icon={FiGlobe}
-                    loading={publishing}
-                    disabled={!canPublish}
-                    onClick={handlePublish}>
-                    Publish to Marketplace
+                  <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-100 rounded-lg">
+                    <FiCheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <p className="text-sm font-500 text-green-800">Analysis complete — submitted for approval.</p>
+                  </div>
+                  <Button variant="secondary" fullWidth icon={FiArrowRight} iconPosition="right" onClick={() => navigate('/approval')}>
+                    Go to Approval Queue
                   </Button>
-                  {!canPublish && (
-                    <p className="text-xs text-yellow-600 text-center">
-                      {!compliancePass
-                        ? `Compliance score below ${PUBLISH_THRESHOLD} — resolve the violations before publishing.`
-                        : `Readiness must reach ${PUBLISH_THRESHOLD}% to publish — add more recommended details.`}
-                    </p>
-                  )}
                   <Button variant="ghost" fullWidth icon={FiRefreshCw} onClick={handleAnalyze}>Re-run Analysis</Button>
                 </>
               )}
               <p className="text-center text-[11px] text-gray-400 leading-relaxed">
-                Publishing requires all mandatory fields, a completed compliance analysis, and a readiness score of {PUBLISH_THRESHOLD}% or higher.
+                After approval, this product is published from the Approval Queue.
               </p>
             </div>
           </div>
