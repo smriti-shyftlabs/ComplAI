@@ -137,6 +137,26 @@ export default function QuickActions() {
           </motion.button>
         );
       })}
+      {actions.map((action, i) => (
+        <motion.button
+          key={action.label}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: i * 0.07 }}
+          whileHover={{ y: -2 }}
+          whileTap={{ scale: 0.97 }}
+          onClick={() => navigate(action.path, action.path === '/products' ? { state: { newProduct: true } } : undefined)}
+          className={`flex flex-col items-center gap-2.5 p-4 rounded-xl transition-all duration-150 border border-transparent hover:border-gray-200 ${action.color}`}
+        >
+          <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shadow-sm">
+            <action.icon className="w-5 h-5" />
+          </div>
+          <div className="text-center">
+            <p className="text-xs font-600">{action.label}</p>
+            <p className="text-xs opacity-70 mt-0.5 hidden sm:block">{action.description}</p>
+          </div>
+        </motion.button>
+      ))}
     </div>
   );
 }

@@ -55,8 +55,8 @@ export default function ProductForm({ values, errors = {}, onChange, disabled = 
           <Input label="Vendor Email" required type="email" placeholder="vendor@company.com" icon={FiMail}
             value={values.vendorEmail || ''} onChange={e => onChange('vendorEmail', e.target.value)}
             error={errors.vendorEmail} />
-          <Input label="SKU ID" placeholder="e.g. SKU-1001" icon={FiHash}
-            value={values.sku || ''} onChange={e => onChange('sku', e.target.value)} />
+          <Input label="SKU ID" required placeholder="e.g. SKU-1001" icon={FiHash}
+            value={values.sku || ''} onChange={e => onChange('sku', e.target.value)} error={errors.sku} />
           <Input label="Price ($)" required type="number" placeholder="0.00" icon={FiDollarSign} min="0" step="0.01"
             value={values.price || ''} onChange={e => onChange('price', e.target.value)} error={errors.price} />
           <Input label="Product" placeholder="e.g. Laptop"
