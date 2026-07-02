@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 import { useAuth } from '../../context/AuthContext';
+import Select from '../../components/common/Select';
 
 const ROLES = ['Admin', 'Senior Reviewer', 'Compliance Analyst', 'Junior Reviewer', 'Viewer'];
 const DEPARTMENTS = ['Compliance', 'Platform', 'Legal', 'Operations', 'Quality Assurance'];
@@ -95,18 +96,18 @@ export default function Register({ onSwitchToLogin }) {
         </div>
 
         <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Role</label>
-            <select name="role" value={form.role} onChange={handleChange} className={selectCls}>
-              {ROLES.map(r => <option key={r}>{r}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1.5">Department</label>
-            <select name="department" value={form.department} onChange={handleChange} className={selectCls}>
-              {DEPARTMENTS.map(d => <option key={d}>{d}</option>)}
-            </select>
-          </div>
+          <Select
+            label="Role"
+            value={form.role}
+            onChange={v => setForm(p => ({ ...p, role: v }))}
+            options={ROLES}
+          />
+          <Select
+            label="Department"
+            value={form.department}
+            onChange={v => setForm(p => ({ ...p, department: v }))}
+            options={DEPARTMENTS}
+          />
         </div>
 
         <div>

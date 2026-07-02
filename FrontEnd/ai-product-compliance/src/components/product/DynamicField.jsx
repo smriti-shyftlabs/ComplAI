@@ -5,6 +5,7 @@
 import { useState } from 'react';
 import { FiPlus, FiX, FiCheck } from 'react-icons/fi';
 import Input from '../common/Input';
+import Select from '../common/Select';
 
 function FieldLabel({ field }) {
   return (
@@ -141,18 +142,13 @@ export default function DynamicField({ field, value, onChange, error }) {
     return (
       <div>
         <FieldLabel field={field} />
-        <select
+        <Select
           value={value ?? ''}
-          onChange={e => set(e.target.value)}
-          className={`w-full px-3 py-2.5 border rounded-lg text-sm bg-white transition-all
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            ${error ? 'border-red-300' : 'border-gray-300 hover:border-gray-400'}
-            ${value ? 'text-gray-900' : 'text-gray-400'}`}
-        >
-          <option value="" disabled>Select {field.label.toLowerCase()}...</option>
-          {field.options.map(opt => <option key={opt} value={opt} className="text-gray-900">{opt}</option>)}
-        </select>
-        {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+          onChange={set}
+          placeholder={`Select ${field.label.toLowerCase()}…`}
+          options={field.options.map(opt => ({ value: opt, label: opt }))}
+          error={error}
+        />
       </div>
     );
   }
