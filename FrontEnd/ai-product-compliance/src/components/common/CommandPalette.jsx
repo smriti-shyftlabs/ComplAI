@@ -11,7 +11,7 @@ const allActions = [
   { id: 'dashboard',  label: 'Dashboard',          hint: 'Overview and key metrics',        icon: FiHome,        path: '/' },
   { id: 'products',   label: 'Add Product',         hint: 'Submit a product for compliance', icon: FiPlusCircle,  path: '/products' },
   { id: 'compliance', label: 'Compliance Report',   hint: 'Review compliance status',        icon: FiShield,      path: '/compliance' },
-  { id: 'approval',   label: 'Approval Queue',      hint: 'Products awaiting approval',      icon: FiCheckSquare, path: '/approval' },
+  { id: 'approval',   label: 'Products',            hint: 'Products awaiting approval',      icon: FiCheckSquare, path: '/approval' },
   { id: 'audit',      label: 'Audit Trail',         hint: 'Full activity history',           icon: FiList,        path: '/audit' },
   { id: 'published',  label: 'Published Products',  hint: 'Live catalog items',              icon: FiGlobe,       path: '/published' },
   { id: 'analytics',  label: 'Analytics',           hint: 'Charts, trends and insights',     icon: FiBarChart2,   path: '/analytics' },

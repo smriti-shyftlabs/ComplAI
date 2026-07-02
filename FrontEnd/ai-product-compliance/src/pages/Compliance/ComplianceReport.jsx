@@ -379,7 +379,7 @@ export default function ComplianceReport() {
                   </Button>
                 ) : (
                   <Button variant="secondary" fullWidth onClick={() => navigate('/approval')}>
-                    Go to Approval Queue
+                    Go to Products
                   </Button>
                 )}
               </div>

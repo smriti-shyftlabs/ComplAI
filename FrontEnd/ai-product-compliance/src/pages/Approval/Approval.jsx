@@ -67,7 +67,7 @@ export default function Approval() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-700 text-gray-900">Approval Queue</h1>
+        <h1 className="text-2xl font-700 text-gray-900">Products</h1>
         <p className="text-sm text-gray-500 mt-0.5">Review, approve, and publish product submissions</p>
       </div>
 
@@ -134,7 +134,7 @@ export default function Approval() {
           </div>
 
           {/* Reviewer Panel */}
-          <ReviewerPanel />
+          <ReviewerPanel products={products} />
         </div>
       )}
 
