@@ -105,10 +105,20 @@ export default function AddProduct() {
     try {
       const payload = buildPayload(values, readiness.score);
       // First run creates the product; a re-run patches it and forces re-scoring.
-      const saved = product?.id
-        ? await updateProduct(product.id, payload)
-        : await addProduct(payload);
-      const res = await analyzeProduct({ ...payload, ...saved }, !!product?.id);
+      // If the product no longer exists (e.g. a reset backend or a stale draft),
+      // fall back to creating a fresh one instead of failing.
+      let saved = null;
+      if (product?.id) {
+        try {
+          saved = await updateProduct(product.id, payload);
+        } catch (err) {
+          console.warn('Re-run: existing product not found, recreating.', err.message);
+          saved = null;
+        }
+      }
+      if (!saved) saved = await addProduct(payload);
+      const reused = !!(product?.id && saved.id === product.id);
+      const res = await analyzeProduct({ ...payload, ...saved }, reused);
       setProduct(saved);
       setResult(res);
       setAnalyzedSignature(signature);
