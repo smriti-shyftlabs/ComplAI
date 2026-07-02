@@ -20,18 +20,64 @@ function Toggle({ enabled, onChange }) {
   );
 }
 
+const RULES_STORAGE_KEY = 'complai_compliance_rules';
+const EMPTY_RULE = { name: '', severity: 'medium', category: '', description: '' };
+
+/** Seed rule state from the static defaults (enabled), overlaid with any saved edits. */
+function buildInitialRules() {
+  const base = {};
+  RULE_CATEGORIES.forEach(cat => {
+    base[cat] = getRulesForCategory(cat).map(r => ({ ...r, enabled: true }));
+  });
+  try {
+    const saved = JSON.parse(localStorage.getItem(RULES_STORAGE_KEY) || 'null');
+    if (saved) RULE_CATEGORIES.forEach(cat => { if (Array.isArray(saved[cat])) base[cat] = saved[cat]; });
+  } catch { /* ignore corrupt storage */ }
+  return base;
+}
+
 export default function Settings() {
   const [tab, setTab] = useState('general');
   const [users, setUsers] = useState([]);
   const [ruleCategory, setRuleCategory] = useState('Food & Beverage');
   const [ruleSearch, setRuleSearch] = useState('');
+  const [rulesByCategory, setRulesByCategory] = useState(buildInitialRules);
+  const [showAddRule, setShowAddRule] = useState(false);
+  const [newRule, setNewRule] = useState(EMPTY_RULE);
+  const [addError, setAddError] = useState('');
 
   useEffect(() => {
     getUsers().then(setUsers).catch(() => setUsers([]));
   }, []);
 
+  // Persist rule changes (enable/disable + added rules) across reloads.
+  useEffect(() => {
+    try { localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify(rulesByCategory)); } catch { /* ignore */ }
+  }, [rulesByCategory]);
+
+  const toggleRule = (id) => setRulesByCategory(prev => ({
+    ...prev,
+    [ruleCategory]: prev[ruleCategory].map(r => (r.id === id ? { ...r, enabled: !r.enabled } : r)),
+  }));
+
+  const addRule = () => {
+    if (!newRule.name.trim()) { setAddError('Rule name is required'); return; }
+    const rule = {
+      id: `CUSTOM-${Date.now()}`,
+      name: newRule.name.trim(),
+      severity: newRule.severity,
+      category: newRule.category.trim() || 'General',
+      description: newRule.description.trim(),
+      enabled: true,
+    };
+    setRulesByCategory(prev => ({ ...prev, [ruleCategory]: [rule, ...prev[ruleCategory]] }));
+    setNewRule(EMPTY_RULE);
+    setAddError('');
+    setShowAddRule(false);
+  };
+
   // Rules for the selected product category, filtered by the (preserved) search text.
-  const categoryRules = getRulesForCategory(ruleCategory);
+  const categoryRules = rulesByCategory[ruleCategory] || [];
   const visibleRules = ruleSearch.trim()
     ? categoryRules.filter(r =>
         r.name.toLowerCase().includes(ruleSearch.toLowerCase()) ||
@@ -140,8 +186,59 @@ export default function Settings() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base font-600 text-gray-900">Compliance Rules</h2>
-                  <Button size="sm" icon={FiPlus}>Add Rule</Button>
+                  <Button size="sm" icon={FiPlus} onClick={() => { setShowAddRule(v => !v); setAddError(''); }}>
+                    Add Rule
+                  </Button>
                 </div>
+
+                {/* Add-rule form */}
+                {showAddRule && (
+                  <div className="border border-gray-200 rounded-xl p-4 space-y-3 bg-gray-50">
+                    <p className="text-sm font-600 text-gray-900">New rule for {ruleCategory}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Input
+                        label="Rule Name"
+                        placeholder="e.g. Lead Content Limit"
+                        value={newRule.name}
+                        onChange={e => setNewRule(r => ({ ...r, name: e.target.value }))}
+                        error={addError}
+                      />
+                      <div>
+                        <label className="block text-sm font-500 text-gray-700 mb-1.5">Severity</label>
+                        <select
+                          value={newRule.severity}
+                          onChange={e => setNewRule(r => ({ ...r, severity: e.target.value }))}
+                          className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-600"
+                        >
+                          <option value="critical">Critical</option>
+                          <option value="high">High</option>
+                          <option value="medium">Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                      </div>
+                      <Input
+                        label="Group / Domain"
+                        placeholder="e.g. Labeling"
+                        value={newRule.category}
+                        onChange={e => setNewRule(r => ({ ...r, category: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-500 text-gray-700 mb-1.5">Description</label>
+                      <textarea
+                        rows={2}
+                        placeholder="What does this rule check?"
+                        value={newRule.description}
+                        onChange={e => setNewRule(r => ({ ...r, description: e.target.value }))}
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-teal-600"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button size="sm" onClick={addRule}>Save Rule</Button>
+                      <Button size="sm" variant="ghost" onClick={() => { setShowAddRule(false); setNewRule(EMPTY_RULE); setAddError(''); }}>Cancel</Button>
+                    </div>
+                  </div>
+                )}
 
                 {/* Product-category segmented control */}
                 <div className="inline-flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
@@ -178,15 +275,16 @@ export default function Settings() {
                     </div>
                   ) : (
                     visibleRules.map((rule) => (
-                      <div key={rule.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                      <div key={rule.id} className={`flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors ${rule.enabled ? '' : 'opacity-60'}`}>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-500 text-gray-900">{rule.name}</span>
                             <SeverityBadge severity={rule.severity} />
+                            {!rule.enabled && <span className="text-[10px] font-600 text-gray-400 uppercase tracking-wide">Disabled</span>}
                           </div>
                           <p className="text-xs text-gray-500 mt-0.5">{rule.category}</p>
                         </div>
-                        <Toggle enabled={true} onChange={() => {}} />
+                        <Toggle enabled={rule.enabled} onChange={() => toggleRule(rule.id)} />
                         <button className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
                           <FiEdit2 className="w-3.5 h-3.5" />
                         </button>
