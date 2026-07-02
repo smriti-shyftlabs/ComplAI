@@ -164,7 +164,7 @@ export const notifications = [
 const _h = (p) => btoa(unescape(encodeURIComponent(p + '__salt_complianceai')));
 
 export const users = [
-  { id: 'USR-007', name: 'Sneha',            email: 'sneha@shyftlabs.io',          role: 'Admin', department: 'Platform',   avatar: 'SN', passwordHash: _h('admin@123'),  productsReviewed: 0, approvalRate: '0%', status: 'active', createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'USR-009', name: 'Smriti',           email: 'smriti@shyftlabs.io',         role: 'Admin', department: 'Compliance', avatar: 'SM', passwordHash: _h('complai123'), productsReviewed: 0, approvalRate: '0%', status: 'active', createdAt: '2024-01-01T00:00:00Z' },
-  { id: 'USR-010', name: 'Kalyani Paraye',   email: 'kalyani.paraye@shyftlabs.io', role: 'Admin',              department: 'Compliance',  avatar: 'KP', passwordHash: _h('complai123'), productsReviewed: 0,   approvalRate: '0%',  status: 'active', createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'USR-007', name: 'Sneha',            email: 'sneha@shyftlabs.io',          role: 'Admin', department: 'Platform',   avatar: 'SN', passwordHash: _h('admin@123'),  productsReviewed: 48, approvalRate: '92%', status: 'active', createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'USR-009', name: 'Smriti',           email: 'smriti@shyftlabs.io',         role: 'Admin', department: 'Compliance', avatar: 'SM', passwordHash: _h('complai123'), productsReviewed: 37, approvalRate: '86%', status: 'active', createdAt: '2024-01-01T00:00:00Z' },
+  { id: 'USR-010', name: 'Kalyani Paraye',   email: 'kalyani.paraye@shyftlabs.io', role: 'Admin',              department: 'Compliance',  avatar: 'KP', passwordHash: _h('complai123'), productsReviewed: 29,   approvalRate: '78%',  status: 'active', createdAt: '2024-01-01T00:00:00Z' },
 ];

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { Products, AuditLogs } from '../seed.js';
 import { generateId, randomReviewer } from '../utils.js';
+import { sendPublishedEmail } from '../mailer.js';
 
 const router = Router();
 
@@ -85,6 +86,8 @@ router.post('/:id/publish', (req, res) => {
   const updated = Products().update(req.params.id, { status: 'published', publishedAt: new Date().toISOString() });
   if (!updated) return res.status(404).json({ error: `Product ${req.params.id} not found` });
   auditLog(req.params.id, 'Published', randomReviewer(), 'Product published to marketplace');
+  // Notify the vendor their product is now live on the marketplace (fire-and-forget).
+  sendPublishedEmail(updated).catch(() => {});
   res.json(updated);
 });
 

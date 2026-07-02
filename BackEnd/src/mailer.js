@@ -152,3 +152,69 @@ export async function sendDecisionEmail(product, decision, comment, report) {
   try { Emails().insert(record); } catch { /* non-fatal */ }
   return record;
 }
+
+// Marketplace the product goes live on (shown in the publish email).
+const MARKETPLACE = process.env.MARKETPLACE_NAME || 'Amazon';
+
+function buildPublishedText(product, platform) {
+  const L = [];
+  L.push(`PRODUCT PUBLISHED — LIVE ON ${platform.toUpperCase()}`, '');
+  L.push(`Product:  ${product.name} (${product.id})`);
+  L.push(`Category: ${product.category} · Brand: ${product.brand || 'n/a'}`);
+  L.push('', `Great news — "${product.name}" has cleared compliance review and is now published and live on ${platform}. It is available for customers to purchase.`);
+  L.push('', '— ComplAI Compliance Team');
+  return L.join('\n');
+}
+
+function buildPublishedHtml(product, platform) {
+  return `
+  <div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:640px;margin:0 auto;background:#f8fafc;padding:24px;">
+    <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;overflow:hidden;">
+      <div style="background:linear-gradient(135deg,#4f46e5,#2563eb);padding:20px 24px;color:#fff;font-size:18px;font-weight:700;">Compl<span style="color:#c7d2fe;">AI</span> · Marketplace</div>
+      <div style="padding:24px;">
+        <div style="display:inline-block;background:#16a34a;color:#fff;font-size:12px;font-weight:700;padding:4px 12px;border-radius:999px;text-transform:uppercase;">Published</div>
+        <h2 style="margin:14px 0 2px;font-size:20px;color:#111827;">🎉 ${product.name} is now live</h2>
+        <div style="color:#6b7280;font-size:13px;">${product.brand || ''}${product.brand ? ' · ' : ''}${product.category} · ${product.id}</div>
+        <p style="color:#374151;font-size:14px;line-height:1.6;margin:16px 0;">Great news — <strong>${product.name}</strong> has cleared compliance review and is now <strong>published and live on ${platform}</strong>. It's available for customers to purchase.</p>
+        <p style="color:#9ca3af;font-size:12px;margin-top:28px;border-top:1px solid #eee;padding-top:14px;">This is an automated message from ComplAI.</p>
+      </div>
+    </div>
+  </div>`;
+}
+
+/** Notify the vendor that their product went live on the marketplace (fire-and-forget). */
+export async function sendPublishedEmail(product, platform = MARKETPLACE) {
+  const to = product.vendorEmail || NOTIFY_EMAIL || SMTP_USER;
+  const subject = `🎉 Live: ${product.name} — Published to ${platform}`;
+  const record = {
+    id: generateId('MAIL'), to, subject, decision: 'Published',
+    productId: product.id, productName: product.name, sentAt: new Date().toISOString(),
+  };
+  if (!to) {
+    record.status = 'skipped';
+    record.reason = 'no vendor email (add one to the product or set NOTIFY_EMAIL)';
+    console.log(`[mail] SKIPPED (${record.reason}) — "${subject}"`);
+  } else {
+    try {
+      const transport = await getTransport();
+      const info = await transport.sendMail({
+        from: MAIL_FROM || 'ComplAI <no-reply@complai.app>',
+        to, subject,
+        text: buildPublishedText(product, platform),
+        html: buildPublishedHtml(product, platform),
+      });
+      record.status = 'sent';
+      record.mode = mailMode;
+      record.messageId = info.messageId;
+      const preview = nodemailer.getTestMessageUrl(info);
+      if (preview) record.previewUrl = preview;
+      console.log(`[mail] sent "${subject}" → ${to}${preview ? `  ·  preview: ${preview}` : ''}`);
+    } catch (err) {
+      record.status = 'error';
+      record.error = err.message;
+      console.warn(`[mail] FAILED "${subject}" → ${to}: ${err.message}`);
+    }
+  }
+  try { Emails().insert(record); } catch { /* non-fatal */ }
+  return record;
+}
