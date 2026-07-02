@@ -31,10 +31,10 @@ export function PageLoader() {
 
 export function SkeletonCard() {
   const { isDark } = useTheme();
-  const shimmer = isDark ? '#1E3530' : '#E5E7EB';
-  const shimmerAlt = isDark ? '#162C28' : '#F3F4F6';
-  const bg = isDark ? '#112320' : '#FFFFFF';
-  const border = isDark ? 'rgba(43,160,144,0.12)' : '#E5E7EB';
+  const shimmer = isDark ? '#1E1E1E' : '#E5E7EB';
+  const shimmerAlt = isDark ? '#181818' : '#F3F4F6';
+  const bg = isDark ? '#141414' : '#FFFFFF';
+  const border = isDark ? 'rgba(255,255,255,0.06)' : '#E5E7EB';
   return (
     <div
       className="animate-pulse rounded-xl p-6"
@@ -58,9 +58,9 @@ export function SkeletonCard() {
 
 export function SkeletonTable({ rows = 5 }) {
   const { isDark } = useTheme();
-  const shimmer    = isDark ? '#1E3530' : '#E5E7EB';
-  const shimmerAlt = isDark ? '#162C28' : '#F3F4F6';
-  const divider    = isDark ? 'rgba(43,160,144,0.1)' : '#F1F5F9';
+  const shimmer    = isDark ? '#1E1E1E' : '#E5E7EB';
+  const shimmerAlt = isDark ? '#181818' : '#F3F4F6';
+  const divider    = isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9';
   return (
     <div className="animate-pulse">
       <div style={{ height: 40, background: shimmerAlt, borderRadius: 8, marginBottom: 12 }} />

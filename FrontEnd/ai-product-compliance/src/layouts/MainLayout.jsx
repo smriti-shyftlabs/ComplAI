@@ -24,7 +24,7 @@ export default function MainLayout({ children }) {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: isDark ? '#0D1F1D' : '#F0FAF8' }}>
+    <div className="flex h-screen overflow-hidden" style={{ background: isDark ? '#0A0A0A' : '#F4FAF9' }}>
       {/* Desktop Sidebar — hover to expand */}
       <div
         className="hidden lg:flex lg:flex-shrink-0 transition-all duration-300"

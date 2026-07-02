@@ -7,12 +7,15 @@ import Select from '../common/Select';
 import DateFilter from '../common/DateFilter';
 import { formatDate, formatCurrency, isInDateRange } from '../../utils/helpers';
 import { CATEGORIES } from '../../utils/constants';
+import { useTheme } from '../../context/ThemeContext';
 
 const PAGE_SIZE = 10;
 
 export default function ProductTable({ products = [], onDelete, filterStatus = 'all' }) {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [search, setSearch] = useState('');
+  const [hoveredRow, setHoveredRow] = useState(null);
   const [statusFilter, setStatusFilter] = useState(filterStatus);
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [dateFilter, setDateFilter] = useState('all');
@@ -56,13 +59,13 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
   };
 
   const ScoreCell = ({ score }) => {
-    const color = score >= 90 ? 'bg-teal-600' : score >= 75 ? 'bg-teal-600' : score >= 50 ? 'bg-yellow-500' : 'bg-red-500';
+    const barColor = score >= 75 ? '#2BA090' : score >= 50 ? '#F59E0B' : '#EF4444';
     return (
-      <div className="flex items-center gap-2 min-w-[80px]">
-        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-          <div className={`h-full rounded-full ${color}`} style={{ width: `${score}%` }} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 80 }}>
+        <div style={{ flex: 1, height: 5, background: isDark ? '#2A2A2A' : '#E5E7EB', borderRadius: 9999, overflow: 'hidden' }}>
+          <div style={{ height: '100%', width: `${score}%`, background: barColor, borderRadius: 9999 }} />
         </div>
-        <span className="text-xs font-600 text-gray-700 w-7 text-right">{score}</span>
+        <span style={{ fontSize: 12, fontWeight: 600, color: barColor, width: 28, textAlign: 'right' }}>{score}</span>
       </div>
     );
   };
@@ -110,9 +113,13 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto rounded-xl border border-gray-200">
+      <div style={{
+        overflowX: 'auto',
+        borderRadius: 12,
+        border: `1px solid ${isDark ? 'rgba(255,255,255,0.07)' : '#E5E7EB'}`,
+      }}>
         <table className="w-full min-w-[700px]">
-          <thead className="bg-gray-50">
+          <thead style={{ background: isDark ? '#1A1A1A' : '#F9FAFB' }}>
             <tr>
               {[
                 { key: 'name', label: 'Product' },
@@ -126,73 +133,113 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
-                  className="text-left text-xs font-600 text-gray-500 uppercase tracking-wider px-4 py-3 cursor-pointer hover:text-gray-700 select-none"
+                  style={{
+                    textAlign: 'left',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: isDark ? '#525252' : '#6B7280',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    padding: '10px 16px',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#E5E7EB'}`,
+                  }}
                 >
-                  <span className="flex items-center gap-1">{col.label}<SortIcon col={col.key} /></span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                    {col.label}<SortIcon col={col.key} />
+                  </span>
                 </th>
               ))}
-              <th className="text-left text-xs font-600 text-gray-500 uppercase tracking-wider px-4 py-3">Actions</th>
+              <th style={{
+                textAlign: 'left', fontSize: 11, fontWeight: 600,
+                color: isDark ? '#525252' : '#6B7280',
+                textTransform: 'uppercase', letterSpacing: '0.06em',
+                padding: '10px 16px',
+                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#E5E7EB'}`,
+              }}>Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
+          <tbody style={{ background: isDark ? '#141414' : '#FFFFFF' }}>
             {paged.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-sm text-gray-400">No products found</td></tr>
+              <tr>
+                <td colSpan={8} style={{ padding: '48px 16px', textAlign: 'center', fontSize: 14, color: isDark ? '#525252' : '#9CA3AF' }}>
+                  No products found
+                </td>
+              </tr>
             ) : (
-              paged.map((product, i) => (
-                <motion.tr
-                  key={product.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.03 }}
-                  className="hover:bg-gray-50/80 transition-colors group"
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-teal-600 to-teal-800 flex items-center justify-center flex-shrink-0">
-                        <span className="text-white text-xs font-600">{product.name.charAt(0)}</span>
+              paged.map((product, i) => {
+                const isHov = hoveredRow === product.id;
+                return (
+                  <motion.tr
+                    key={product.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.03 }}
+                    onMouseEnter={() => setHoveredRow(product.id)}
+                    onMouseLeave={() => setHoveredRow(null)}
+                    style={{
+                      background: isHov ? (isDark ? 'rgba(255,255,255,0.03)' : '#F9FAFB') : 'transparent',
+                      borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : '#F3F4F6'}`,
+                      transition: 'background 0.15s ease',
+                    }}
+                  >
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <div style={{
+                          width: 32, height: 32, borderRadius: 8,
+                          background: 'linear-gradient(135deg, #2BA090, #1A6E65)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>{product.name.charAt(0)}</span>
+                        </div>
+                        <div style={{ minWidth: 0 }}>
+                          <p style={{ fontSize: 13.5, fontWeight: 500, color: isDark ? '#E5E5E5' : '#111827', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>{product.name}</p>
+                          <p style={{ fontSize: 11, color: isDark ? '#525252' : '#9CA3AF', margin: 0 }}>{product.id}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-500 text-gray-900 truncate max-w-[160px]">{product.name}</p>
-                        <p className="text-xs text-gray-400">{product.id}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md">{product.category}</span>
-                  </td>
-                  <td className="px-4 py-3 text-sm font-500 text-gray-700">{formatCurrency(product.price)}</td>
-                  <td className="px-4 py-3"><StatusBadge status={product.status} /></td>
-                  <td className="px-4 py-3"><ScoreCell score={product.complianceScore} /></td>
-                  <td className="px-4 py-3"><RiskBadge risk={product.riskLevel} /></td>
-                  <td className="px-4 py-3 text-xs text-gray-500">{formatDate(product.createdAt)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => navigate('/compliance')}
-                        className="p-1.5 rounded-lg hover:bg-teal-50 hover:text-teal-700 text-gray-400 transition-colors"
-                        title="View"
-                      >
-                        <FiEye className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
-                        title="Edit"
-                      >
-                        <FiEdit2 className="w-3.5 h-3.5" />
-                      </button>
-                      {onDelete && (
+                    </td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <span style={{
+                        fontSize: 11.5, color: isDark ? '#A3A3A3' : '#6B7280',
+                        background: isDark ? 'rgba(255,255,255,0.06)' : '#F3F4F6',
+                        padding: '3px 8px', borderRadius: 6,
+                      }}>{product.category}</span>
+                    </td>
+                    <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 500, color: isDark ? '#D4D4D4' : '#374151' }}>{formatCurrency(product.price)}</td>
+                    <td style={{ padding: '12px 16px' }}><StatusBadge status={product.status} /></td>
+                    <td style={{ padding: '12px 16px' }}><ScoreCell score={product.complianceScore} /></td>
+                    <td style={{ padding: '12px 16px' }}><RiskBadge risk={product.riskLevel} /></td>
+                    <td style={{ padding: '12px 16px', fontSize: 11.5, color: isDark ? '#525252' : '#9CA3AF' }}>{formatDate(product.createdAt)}</td>
+                    <td style={{ padding: '12px 16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, opacity: isHov ? 1 : 0, transition: 'opacity 0.15s ease' }}>
                         <button
-                          onClick={() => onDelete(product.id)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-600 transition-colors"
-                          title="Delete"
+                          onClick={() => navigate('/compliance')}
+                          style={{ padding: 6, borderRadius: 8, border: 'none', cursor: 'pointer', background: isDark ? 'rgba(43,160,144,0.12)' : '#F0FAF8', color: '#2BA090' }}
+                          title="View"
                         >
-                          <FiTrash2 className="w-3.5 h-3.5" />
+                          <FiEye style={{ width: 14, height: 14 }} />
                         </button>
-                      )}
-                    </div>
-                  </td>
-                </motion.tr>
-              ))
+                        <button
+                          style={{ padding: 6, borderRadius: 8, border: 'none', cursor: 'pointer', background: isDark ? 'rgba(255,255,255,0.06)' : '#F3F4F6', color: isDark ? '#737373' : '#6B7280' }}
+                          title="Edit"
+                        >
+                          <FiEdit2 style={{ width: 14, height: 14 }} />
+                        </button>
+                        {onDelete && (
+                          <button
+                            onClick={() => onDelete(product.id)}
+                            style={{ padding: 6, borderRadius: 8, border: 'none', cursor: 'pointer', background: isDark ? 'rgba(239,68,68,0.12)' : '#FEF2F2', color: '#EF4444' }}
+                            title="Delete"
+                          >
+                            <FiTrash2 style={{ width: 14, height: 14 }} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </motion.tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -200,17 +247,24 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-xs text-gray-500">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
+          <p style={{ fontSize: 12, color: isDark ? '#525252' : '#9CA3AF' }}>
             Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
           </p>
-          <div className="flex items-center gap-1">
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              style={{
+                padding: 6, borderRadius: 8,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+                background: isDark ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
+                color: isDark ? '#737373' : '#6B7280',
+                cursor: page === 1 ? 'not-allowed' : 'pointer',
+                opacity: page === 1 ? 0.4 : 1,
+              }}
             >
-              <FiChevronLeft className="w-4 h-4 text-gray-600" />
+              <FiChevronLeft style={{ width: 16, height: 16 }} />
             </button>
             {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
               const p = i + 1;
@@ -218,7 +272,12 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`w-8 h-8 rounded-lg text-xs font-600 border transition-colors ${page === p ? 'bg-teal-700 text-white border-teal-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                  style={{
+                    width: 32, height: 32, borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    background: page === p ? '#2BA090' : (isDark ? 'rgba(255,255,255,0.04)' : '#FFFFFF'),
+                    color: page === p ? '#FFFFFF' : (isDark ? '#737373' : '#6B7280'),
+                    border: `1px solid ${page === p ? '#2BA090' : (isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB')}`,
+                  }}
                 >
                   {p}
                 </button>
@@ -227,9 +286,16 @@ export default function ProductTable({ products = [], onDelete, filterStatus = '
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="p-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              style={{
+                padding: 6, borderRadius: 8,
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E5E7EB'}`,
+                background: isDark ? 'rgba(255,255,255,0.04)' : '#FFFFFF',
+                color: isDark ? '#737373' : '#6B7280',
+                cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                opacity: page === totalPages ? 0.4 : 1,
+              }}
             >
-              <FiChevronRight className="w-4 h-4 text-gray-600" />
+              <FiChevronRight style={{ width: 16, height: 16 }} />
             </button>
           </div>
         </div>

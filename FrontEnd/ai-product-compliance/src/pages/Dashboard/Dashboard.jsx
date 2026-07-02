@@ -19,24 +19,24 @@ const iconMap = { FiPackage, FiShield, FiClock, FiXCircle };
 function getAlertStyle(type, isDark) {
   const map = {
     critical: {
-      bg:     isDark ? 'rgba(127,29,29,0.35)'  : '#FEF2F2',
+      bg:     isDark ? 'rgba(127,29,29,0.28)'  : '#FEF2F2',
       border: isDark ? '#DC2626' : '#EF4444',
       color:  isDark ? '#FCA5A5' : '#B91C1C',
     },
     warning: {
-      bg:     isDark ? 'rgba(120,53,15,0.35)'  : '#FFFBEB',
+      bg:     isDark ? 'rgba(120,53,15,0.28)'  : '#FFFBEB',
       border: isDark ? '#D97706' : '#F59E0B',
       color:  isDark ? '#FCD34D' : '#92400E',
     },
     info: {
-      bg:     isDark ? 'rgba(12,53,48,0.55)'   : '#F0FAF8',
+      bg:     isDark ? 'rgba(43,160,144,0.08)' : '#F0FAF8',
       border: isDark ? '#2BA090' : '#2BA090',
-      color:  isDark ? '#7EC8BE' : '#0C3530',
+      color:  isDark ? '#2CB5A3' : '#0C3530',
     },
     success: {
-      bg:     isDark ? 'rgba(12,53,48,0.55)'   : '#F0FAF8',
+      bg:     isDark ? 'rgba(43,160,144,0.08)' : '#F0FAF8',
       border: isDark ? '#2BA090' : '#2BA090',
-      color:  isDark ? '#7EC8BE' : '#0C3530',
+      color:  isDark ? '#2CB5A3' : '#0C3530',
     },
   };
   return map[type] || map.info;

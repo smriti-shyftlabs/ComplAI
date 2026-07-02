@@ -51,8 +51,18 @@ export default function Button({
         ${className}
       `}
       style={
-        variant === 'primary' || variant === 'success'
-          ? { background: '#155E56', color: '#F0FAF8' }
+        variant === 'primary'
+          ? {
+              background: isDark
+                ? 'linear-gradient(135deg, #1A6E65, #2BA090)'
+                : 'linear-gradient(135deg, #0C3530, #1A6E65)',
+              color: '#F0FAF8',
+              boxShadow: isDark
+                ? '0 2px 12px rgba(43,160,144,0.25)'
+                : '0 2px 12px rgba(12,53,48,0.25)',
+            }
+          : variant === 'success'
+          ? { background: 'linear-gradient(135deg, #065F46, #10B981)', color: '#ECFDF5', boxShadow: '0 2px 12px rgba(16,185,129,0.25)' }
           : variant === 'outline'
           ? { color: '#2BA090', borderColor: '#7EC8BE' }
           : variant === 'ghost'
@@ -60,7 +70,7 @@ export default function Button({
           : variant === 'secondary'
           ? isDark
             ? { color: '#7EC8BE', borderColor: 'rgba(43,160,144,0.35)', backgroundColor: '#182E2B' }
-            : { color: '#0C3530', borderColor: '#BDD8D3' }
+            : { color: '#0C3530', borderColor: '#BDD8D3', backgroundColor: '#FFFFFF' }
           : {}
       }
       {...props}

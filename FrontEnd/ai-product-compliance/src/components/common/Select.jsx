@@ -125,18 +125,18 @@ export default function Select({
     border: open
       ? `1px solid #2BA090`
       : isDark
-        ? `1px solid rgba(43,160,144,0.25)`
+        ? `1px solid rgba(255,255,255,0.1)`
         : `1px solid rgba(155,192,185,0.65)`,
     background: isDark
-      ? open ? '#1E3531' : '#182E2B'
+      ? open ? '#222222' : '#1A1A1A'
       : open ? '#f6fdfb' : '#ffffff',
     color: selected
-      ? isDark ? '#DDF0ED' : '#0C3530'
-      : isDark ? '#4A9B90' : '#9CA3AF',
+      ? isDark ? '#FAFAFA' : '#0C3530'
+      : isDark ? '#525252' : '#9CA3AF',
     boxShadow: open
       ? `0 0 0 3px rgba(43,160,144,0.14)`
       : isDark
-        ? '0 1px 3px rgba(0,0,0,0.25)'
+        ? '0 1px 3px rgba(0,0,0,0.4)'
         : '0 1px 2px rgba(12,53,48,0.05)',
     opacity: disabled ? 0.5 : 1,
   };
@@ -150,11 +150,11 @@ export default function Select({
     borderRadius: 10,
     overflow: 'hidden',
     border: isDark
-      ? '1px solid rgba(43,160,144,0.2)'
+      ? '1px solid rgba(255,255,255,0.1)'
       : '1px solid rgba(189,216,211,0.55)',
-    background: isDark ? '#122420' : '#ffffff',
+    background: isDark ? '#1C1C1C' : '#ffffff',
     boxShadow: isDark
-      ? '0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3)'
+      ? '0 8px 32px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.4)'
       : '0 8px 32px rgba(12,53,48,0.12), 0 2px 8px rgba(12,53,48,0.06)',
   };
 
@@ -166,7 +166,7 @@ export default function Select({
           fontSize: 13,
           fontWeight: 500,
           marginBottom: 6,
-          color: isDark ? '#B0D8D1' : '#374151',
+          color: isDark ? '#A3A3A3' : '#374151',
         }}>
           {label}
         </label>
@@ -193,7 +193,7 @@ export default function Select({
           <FiChevronDown
             style={{
               width: 15, height: 15,
-              color: isDark ? '#4A9B90' : '#6B7280',
+              color: isDark ? '#525252' : '#6B7280',
               transition: 'color 0.15s',
             }}
           />
@@ -239,21 +239,21 @@ export default function Select({
                       transition: 'background 0.1s',
                       background: isSelected
                         ? isDark
-                          ? 'rgba(43,160,144,0.22)'
+                          ? 'rgba(43,160,144,0.15)'
                           : 'rgba(43,160,144,0.1)'
                         : isFocused
                           ? isDark
-                            ? 'rgba(43,160,144,0.12)'
+                            ? 'rgba(255,255,255,0.06)'
                             : 'rgba(43,160,144,0.06)'
                           : 'transparent',
                       color: isSelected
-                        ? isDark ? '#7EC8BE' : '#155E56'
-                        : isDark ? '#C8E8E3' : '#1F2937',
+                        ? isDark ? '#2CB5A3' : '#155E56'
+                        : isDark ? '#D4D4D4' : '#1F2937',
                     }}
                   >
                     <span>{item.label}</span>
                     {isSelected && (
-                      <FiCheck style={{ width: 13, height: 13, flexShrink: 0, color: isDark ? '#7EC8BE' : '#2BA090' }} />
+                      <FiCheck style={{ width: 13, height: 13, flexShrink: 0, color: isDark ? '#2CB5A3' : '#2BA090' }} />
                     )}
                   </button>
                 );

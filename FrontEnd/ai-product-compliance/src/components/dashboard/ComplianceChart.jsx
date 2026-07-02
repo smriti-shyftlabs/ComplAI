@@ -7,23 +7,23 @@ function CustomTooltip({ active, payload, label, isDark }) {
   if (!active || !payload || !payload.length) return null;
   return (
     <div style={{
-      background: isDark ? '#1A3530' : '#ffffff',
-      border: `1px solid ${isDark ? 'rgba(43,160,144,0.3)' : '#E2E8F0'}`,
+      background: isDark ? '#1C1C1C' : '#ffffff',
+      border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#E2E8F0'}`,
       borderRadius: 10,
       padding: '10px 14px',
       boxShadow: isDark
-        ? '0 8px 24px rgba(0,0,0,0.5)'
+        ? '0 8px 24px rgba(0,0,0,0.7)'
         : '0 8px 24px rgba(12,53,48,0.12)',
       minWidth: 140,
     }}>
-      <p style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#DDF0ED' : '#111827', marginBottom: 8 }}>
+      <p style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#FAFAFA' : '#111827', marginBottom: 8 }}>
         {label}
       </p>
       {payload.map((entry, i) => (
         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: entry.color, flexShrink: 0 }} />
-          <span style={{ fontSize: 12, color: isDark ? '#9ECDC7' : '#6B7280' }}>{entry.name}:</span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#DDF0ED' : '#111827' }}>
+          <span style={{ fontSize: 12, color: isDark ? '#A3A3A3' : '#6B7280' }}>{entry.name}:</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: isDark ? '#FAFAFA' : '#111827' }}>
             {entry.name === 'Compliance Score' ? `${entry.value}%` : entry.value}
           </span>
         </div>
@@ -35,8 +35,8 @@ function CustomTooltip({ active, payload, label, isDark }) {
 export default function ComplianceChart({ data = [] }) {
   const { isDark } = useTheme();
 
-  const gridColor   = isDark ? 'rgba(255,255,255,0.05)' : '#F1F5F9';
-  const tickColor   = isDark ? '#4A9B90' : '#94A3B8';
+  const gridColor   = isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9';
+  const tickColor   = isDark ? '#3A3A3A' : '#94A3B8';
 
   return (
     <div className="h-64 sm:h-72">

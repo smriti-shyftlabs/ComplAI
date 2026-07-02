@@ -74,10 +74,10 @@ export default function Navbar({ onMenuClick }) {
     zIndex: 50,
     borderRadius: 14,
     overflow: 'hidden',
-    border: isDark ? '1px solid rgba(43,160,144,0.18)' : '1px solid #E2E8F0',
-    background: isDark ? '#132622' : '#ffffff',
+    border: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid #E2E8F0',
+    background: isDark ? '#1C1C1C' : '#ffffff',
     boxShadow: isDark
-      ? '0 16px 48px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.3)'
+      ? '0 16px 48px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.4)'
       : '0 16px 48px rgba(12,53,48,0.14), 0 4px 12px rgba(12,53,48,0.06)',
   };
 
@@ -93,7 +93,7 @@ export default function Navbar({ onMenuClick }) {
     border: 'none',
     background: 'none',
     textAlign: 'left',
-    color: isDark ? '#C8E8E3' : '#374151',
+    color: isDark ? '#D4D4D4' : '#374151',
     transition: 'background 0.12s',
     ...extra,
   });
@@ -102,8 +102,9 @@ export default function Navbar({ onMenuClick }) {
     <header
       className="sticky top-0 z-30 h-16 flex items-center px-4 sm:px-6 gap-4"
       style={{
-        background: isDark ? '#0F2421' : '#F0FAF8',
-        borderBottom: `1px solid ${isDark ? 'rgba(43,160,144,0.15)' : '#BDD8D3'}`,
+        background: isDark ? '#0D0D0D' : '#FFFFFF',
+        borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#E8F4F2'}`,
+        boxShadow: isDark ? 'none' : '0 1px 8px rgba(12,53,48,0.06)',
       }}
     >
       {/* Hamburger */}
@@ -117,35 +118,51 @@ export default function Navbar({ onMenuClick }) {
 
       {/* Greeting */}
       <div className="hidden sm:block">
-        <p className="text-sm font-semibold" style={{ color: isDark ? '#A8D5CE' : '#0C3530' }}>
+        <p className="text-sm font-semibold" style={{ color: isDark ? '#E5E5E5' : '#0C3530' }}>
           {getGreeting()}, {currentUser?.name?.split(' ')[0] || 'User'}
         </p>
-        <p className="text-xs" style={{ color: isDark ? '#4A9B90' : '#2BA090' }}>
+        <p className="text-xs" style={{ color: isDark ? '#737373' : '#6B9E99' }}>
           Welcome back to ComplAI
         </p>
       </div>
 
       {/* Search — opens command palette */}
-      <div className="flex-1 max-w-md mx-auto">
+      <div style={{ marginLeft: 'auto', marginRight: 4, width: 280, flexShrink: 0 }}>
         <button
           onClick={() => window.dispatchEvent(new Event('open-command-palette'))}
-          className="w-full flex items-center gap-2.5 px-3.5 py-2 rounded-lg text-sm transition-all text-left"
           style={{
-            background: isDark ? '#182E2B' : '#C5E8E3',
-            border: `1px solid ${isDark ? 'rgba(43,160,144,0.2)' : '#BDD8D3'}`,
-            color: isDark ? '#4A9B90' : '#7EC8BE',
+            width: '100%',
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: '7px 12px',
+            borderRadius: 10,
+            textAlign: 'left',
+            cursor: 'pointer',
+            background: isDark ? '#1A1A1A' : '#FFFFFF',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : '#D1E8E5'}`,
+            boxShadow: isDark ? 'none' : '0 1px 4px rgba(12,53,48,0.06)',
+            transition: 'border-color 0.15s, box-shadow 0.15s',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.14)' : '#2BA090';
+            e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 8px rgba(12,53,48,0.1)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.borderColor = isDark ? 'rgba(255,255,255,0.08)' : '#D1E8E5';
+            e.currentTarget.style.boxShadow = isDark ? 'none' : '0 1px 4px rgba(12,53,48,0.06)';
           }}
         >
-          <FiSearch style={{ width: 15, height: 15, flexShrink: 0, color: isDark ? '#2BA090' : '#2BA090' }} />
-          <span style={{ flex: 1, fontWeight: 500, fontSize: '0.82rem' }}>Search or jump to...</span>
-          <span className="hidden sm:flex items-center gap-0.5">
+          <FiSearch style={{ width: 14, height: 14, flexShrink: 0, color: isDark ? '#525252' : '#2BA090' }} />
+          <span style={{ flex: 1, fontWeight: 400, fontSize: 13, color: isDark ? '#525252' : '#9CA3AF' }}>
+            Search or jump to...
+          </span>
+          <span className="hidden sm:flex items-center gap-1">
             {['⌘', 'K'].map(k => (
               <kbd key={k} style={{
-                background: isDark ? '#1E3531' : '#F0FAF8',
-                border: `1px solid ${isDark ? 'rgba(43,160,144,0.25)' : '#BDD8D3'}`,
+                background: isDark ? '#222222' : '#F0FAF8',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : '#D1E8E5'}`,
                 borderRadius: 4, padding: '1px 5px',
                 fontFamily: 'inherit', fontWeight: 700,
-                fontSize: '0.6rem', color: '#2BA090',
+                fontSize: '0.6rem', color: isDark ? '#525252' : '#2BA090',
               }}>{k}</kbd>
             ))}
           </span>
@@ -153,14 +170,14 @@ export default function Navbar({ onMenuClick }) {
       </div>
 
       {/* Right actions */}
-      <div className="flex items-center gap-1 ml-auto">
+      <div className="flex items-center gap-1">
 
         {/* Theme toggle */}
         <button
           onClick={toggleDark}
           className="p-2 rounded-lg transition-colors"
-          style={{ color: isDark ? '#4A9B90' : '#6B7280' }}
-          onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(43,160,144,0.12)' : '#E5E7EB'; }}
+          style={{ color: isDark ? '#737373' : '#2BA090' }}
+          onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(43,160,144,0.08)'; }}
           onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
         >
           {isDark ? <FiSun className="w-4 h-4" /> : <FiMoon className="w-4 h-4" />}
@@ -171,8 +188,8 @@ export default function Navbar({ onMenuClick }) {
           <button
             onClick={() => { setShowNotifications(p => !p); setShowProfile(false); }}
             className="relative p-2 rounded-lg transition-colors"
-            style={{ color: isDark ? '#4A9B90' : '#6B7280' }}
-            onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(43,160,144,0.12)' : '#E5E7EB'; }}
+            style={{ color: isDark ? '#737373' : '#2BA090' }}
+            onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(43,160,144,0.08)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
           >
             <FiBell className="w-4 h-4" />
@@ -196,9 +213,9 @@ export default function Navbar({ onMenuClick }) {
                 <div style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '12px 16px',
-                  borderBottom: `1px solid ${isDark ? 'rgba(43,160,144,0.12)' : '#F1F5F9'}`,
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}`,
                 }}>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: isDark ? '#DDF0ED' : '#111827' }}>
+                  <span style={{ fontSize: 14, fontWeight: 600, color: isDark ? '#FAFAFA' : '#111827' }}>
                     Notifications
                   </span>
                   <button
@@ -219,17 +236,17 @@ export default function Navbar({ onMenuClick }) {
                         cursor: 'pointer',
                         borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.04)' : '#F9FAFB'}`,
                         background: !n.read
-                          ? isDark ? 'rgba(43,160,144,0.07)' : 'rgba(43,160,144,0.04)'
+                          ? isDark ? 'rgba(255,255,255,0.04)' : 'rgba(43,160,144,0.04)'
                           : 'transparent',
                       }}
                     >
                       <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${typeColors[n.type] || 'bg-gray-400'}`} />
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 12, fontWeight: !n.read ? 600 : 500, color: isDark ? '#DDF0ED' : '#111827' }}>
+                        <p style={{ fontSize: 12, fontWeight: !n.read ? 600 : 500, color: isDark ? '#FAFAFA' : '#111827' }}>
                           {n.title}
                         </p>
-                        <p style={{ fontSize: 11, color: isDark ? '#6B9E99' : '#6B7280', marginTop: 2 }}>{n.message}</p>
-                        <p style={{ fontSize: 11, color: isDark ? '#4A9B90' : '#9CA3AF', marginTop: 4 }}>{n.time}</p>
+                        <p style={{ fontSize: 11, color: isDark ? '#737373' : '#6B7280', marginTop: 2 }}>{n.message}</p>
+                        <p style={{ fontSize: 11, color: isDark ? '#525252' : '#9CA3AF', marginTop: 4 }}>{n.time}</p>
                       </div>
                     </div>
                   ))}
@@ -238,7 +255,7 @@ export default function Navbar({ onMenuClick }) {
                 {/* Footer */}
                 <div style={{
                   padding: '10px 16px', textAlign: 'center',
-                  borderTop: `1px solid ${isDark ? 'rgba(43,160,144,0.12)' : '#F1F5F9'}`,
+                  borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}`,
                 }}>
                   <button style={{ fontSize: 12, color: '#2BA090', cursor: 'pointer', background: 'none', border: 'none', fontWeight: 500 }}>
                     View all notifications
@@ -260,12 +277,12 @@ export default function Navbar({ onMenuClick }) {
               cursor: 'pointer',
               border: 'none',
               background: showProfile
-                ? isDark ? 'rgba(43,160,144,0.14)' : '#E5E7EB'
+                ? isDark ? 'rgba(255,255,255,0.08)' : '#E5E7EB'
                 : 'transparent',
               transition: 'background 0.15s',
             }}
             onMouseEnter={e => {
-              if (!showProfile) e.currentTarget.style.background = isDark ? 'rgba(43,160,144,0.1)' : '#F3F4F6';
+              if (!showProfile) e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.05)' : '#F3F4F6';
             }}
             onMouseLeave={e => {
               if (!showProfile) e.currentTarget.style.background = 'transparent';
@@ -286,10 +303,10 @@ export default function Navbar({ onMenuClick }) {
 
             {/* Name + role */}
             <div className="hidden sm:block text-left" style={{ lineHeight: 1.25 }}>
-              <p style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#DDF0ED' : '#111827' }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#FAFAFA' : '#111827' }}>
                 {currentUser?.name || 'User'}
               </p>
-              <p style={{ fontSize: 11, color: isDark ? '#4A9B90' : '#6B7280' }}>
+              <p style={{ fontSize: 11, color: isDark ? '#737373' : '#6B7280' }}>
                 {currentUser?.role || 'Member'}
               </p>
             </div>
@@ -298,7 +315,7 @@ export default function Navbar({ onMenuClick }) {
               className="hidden sm:block"
               style={{
                 width: 14, height: 14,
-                color: isDark ? '#4A9B90' : '#9CA3AF',
+                color: isDark ? '#525252' : '#9CA3AF',
                 transform: showProfile ? 'rotate(180deg)' : 'rotate(0deg)',
                 transition: 'transform 0.18s',
               }}
@@ -317,7 +334,7 @@ export default function Navbar({ onMenuClick }) {
                 {/* User info */}
                 <div style={{
                   padding: '14px 16px 12px',
-                  borderBottom: `1px solid ${isDark ? 'rgba(43,160,144,0.12)' : '#F1F5F9'}`,
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}`,
                 }}>
                   {/* Mini avatar row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
@@ -331,10 +348,10 @@ export default function Navbar({ onMenuClick }) {
                       {initials}
                     </div>
                     <div>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#DDF0ED' : '#111827', lineHeight: 1.3 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: isDark ? '#FAFAFA' : '#111827', lineHeight: 1.3 }}>
                         {currentUser?.name}
                       </p>
-                      <p style={{ fontSize: 11, color: isDark ? '#4A9B90' : '#6B7280' }}>
+                      <p style={{ fontSize: 11, color: isDark ? '#737373' : '#6B7280' }}>
                         {currentUser?.email}
                       </p>
                     </div>
@@ -345,9 +362,9 @@ export default function Navbar({ onMenuClick }) {
                     fontSize: 11, fontWeight: 600,
                     padding: '2px 8px',
                     borderRadius: 20,
-                    background: isDark ? 'rgba(43,160,144,0.18)' : 'rgba(43,160,144,0.1)',
-                    color: isDark ? '#7EC8BE' : '#155E56',
-                    border: `1px solid ${isDark ? 'rgba(43,160,144,0.3)' : 'rgba(43,160,144,0.25)'}`,
+                    background: isDark ? 'rgba(43,160,144,0.12)' : 'rgba(43,160,144,0.1)',
+                    color: isDark ? '#2CB5A3' : '#155E56',
+                    border: `1px solid ${isDark ? 'rgba(43,160,144,0.2)' : 'rgba(43,160,144,0.25)'}`,
                   }}>
                     {currentUser?.role || 'Member'}
                   </span>
@@ -358,38 +375,38 @@ export default function Navbar({ onMenuClick }) {
                   <button
                     style={menuItem()}
                     onClick={() => { navigate('/settings'); setShowProfile(false); }}
-                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(43,160,144,0.1)' : '#F9FAFB'; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : '#F9FAFB'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                   >
-                    <FiUser style={{ width: 15, height: 15, color: isDark ? '#4A9B90' : '#9CA3AF' }} />
+                    <FiUser style={{ width: 15, height: 15, color: isDark ? '#525252' : '#9CA3AF' }} />
                     Profile
                   </button>
                   <button
                     style={menuItem()}
                     onClick={() => { navigate('/settings'); setShowProfile(false); }}
-                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(43,160,144,0.1)' : '#F9FAFB'; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : '#F9FAFB'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                   >
-                    <FiSettings style={{ width: 15, height: 15, color: isDark ? '#4A9B90' : '#9CA3AF' }} />
+                    <FiSettings style={{ width: 15, height: 15, color: isDark ? '#525252' : '#9CA3AF' }} />
                     Settings
                   </button>
                   <button
                     style={menuItem()}
                     onClick={() => { navigate('/settings'); setShowProfile(false); }}
-                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(43,160,144,0.1)' : '#F9FAFB'; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(255,255,255,0.06)' : '#F9FAFB'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                   >
-                    <FiShield style={{ width: 15, height: 15, color: isDark ? '#4A9B90' : '#9CA3AF' }} />
+                    <FiShield style={{ width: 15, height: 15, color: isDark ? '#525252' : '#9CA3AF' }} />
                     Compliance Rules
                   </button>
                 </div>
 
                 {/* Sign out */}
-                <div style={{ borderTop: `1px solid ${isDark ? 'rgba(43,160,144,0.12)' : '#F1F5F9'}`, padding: '6px 0' }}>
+                <div style={{ borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : '#F1F5F9'}`, padding: '6px 0' }}>
                   <button
                     style={menuItem({ color: '#EF4444', fontWeight: 600 })}
                     onClick={handleLogout}
-                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(239,68,68,0.1)' : '#FEF2F2'; }}
+                    onMouseEnter={e => { e.currentTarget.style.background = isDark ? 'rgba(239,68,68,0.12)' : '#FEF2F2'; }}
                     onMouseLeave={e => { e.currentTarget.style.background = 'none'; }}
                   >
                     <FiLogOut style={{ width: 15, height: 15, color: '#EF4444' }} />

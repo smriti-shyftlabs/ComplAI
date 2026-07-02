@@ -1,8 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { getComplianceColor } from '../../utils/helpers';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function ComplianceScore({ score = 0, size = 'lg', showLabel = true }) {
+  const { isDark } = useTheme();
   const sizes = {
     sm: { container: 'w-20 h-20', text: 'text-xl', label: 'text-xs', stroke: 4, r: 32 },
     md: { container: 'w-28 h-28', text: 'text-2xl', label: 'text-xs', stroke: 6, r: 44 },
@@ -24,7 +26,7 @@ export default function ComplianceScore({ score = 0, size = 'lg', showLabel = tr
             cy={r + stroke}
             r={r}
             fill="none"
-            stroke="#F1F5F9"
+            stroke={isDark ? '#2A2A2A' : '#F1F5F9'}
             strokeWidth={stroke}
           />
           {/* Progress */}
@@ -40,6 +42,7 @@ export default function ComplianceScore({ score = 0, size = 'lg', showLabel = tr
             initial={{ strokeDashoffset: circumference }}
             animate={{ strokeDashoffset: offset }}
             transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
+            style={isDark ? { filter: `drop-shadow(0 0 6px ${color}70)` } : {}}
           />
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -52,7 +55,7 @@ export default function ComplianceScore({ score = 0, size = 'lg', showLabel = tr
           >
             {score}
           </motion.span>
-          <span className={`${label} text-gray-500 font-500`}>/ 100</span>
+          <span className={`${label} font-500`} style={{ color: isDark ? '#525252' : '#6B7280' }}>/ 100</span>
         </div>
       </div>
       {showLabel && (

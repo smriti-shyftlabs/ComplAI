@@ -51,10 +51,10 @@ export default function DateFilter({ value, onChange, className = '' }) {
     fontSize: 13,
     fontWeight: 500,
     border: isDark
-      ? '1px solid rgba(43,160,144,0.25)'
+      ? '1px solid rgba(255,255,255,0.1)'
       : '1px solid rgba(155,192,185,0.65)',
-    background: isDark ? '#182E2B' : '#ffffff',
-    color: isDark ? '#DDF0ED' : '#0C3530',
+    background: isDark ? '#1A1A1A' : '#ffffff',
+    color: isDark ? '#FAFAFA' : '#0C3530',
     outline: 'none',
     width: 130,
     cursor: 'pointer',
@@ -68,7 +68,7 @@ export default function DateFilter({ value, onChange, className = '' }) {
   };
 
   const blurInput = (e) => {
-    e.target.style.borderColor = isDark ? 'rgba(43,160,144,0.25)' : 'rgba(155,192,185,0.65)';
+    e.target.style.borderColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(155,192,185,0.65)';
     e.target.style.boxShadow = 'none';
   };
 
@@ -81,7 +81,7 @@ export default function DateFilter({ value, onChange, className = '' }) {
         style={{
           width: 16,
           height: 16,
-          color: isDark ? '#4A9B90' : '#9CA3AF',
+          color: isDark ? '#525252' : '#9CA3AF',
           flexShrink: 0,
         }}
       />
@@ -103,7 +103,7 @@ export default function DateFilter({ value, onChange, className = '' }) {
             onBlur={blurInput}
             style={inputStyle}
           />
-          <span style={{ fontSize: 12, color: isDark ? '#4A9B90' : '#9CA3AF', flexShrink: 0 }}>
+          <span style={{ fontSize: 12, color: isDark ? '#737373' : '#9CA3AF', flexShrink: 0 }}>
             to
           </span>
           <input
