@@ -86,7 +86,7 @@ export default function Dashboard() {
           <h1 className="text-2xl font-700 text-gray-900">Dashboard</h1>
           <p className="text-sm text-gray-500 mt-0.5">Monitor your product compliance and catalog governance</p>
         </div>
-        <Button icon={FiPackage} onClick={() => navigate('/products')}>
+        <Button icon={FiPackage} onClick={() => navigate('/products', { state: { newProduct: true } })}>
           Add New Product
         </Button>
       </div>

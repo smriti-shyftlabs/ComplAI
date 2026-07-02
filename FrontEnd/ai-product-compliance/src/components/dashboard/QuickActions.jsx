@@ -46,7 +46,7 @@ export default function QuickActions() {
           transition={{ delay: i * 0.07 }}
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.97 }}
-          onClick={() => navigate(action.path)}
+          onClick={() => navigate(action.path, action.path === '/products' ? { state: { newProduct: true } } : undefined)}
           className={`flex flex-col items-center gap-2.5 p-4 rounded-xl transition-all duration-150 border border-transparent hover:border-gray-200 ${action.color}`}
         >
           <div className="w-10 h-10 rounded-xl bg-white/60 flex items-center justify-center shadow-sm">
