@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FiUser, FiShield, FiBell, FiUsers, FiLink, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { getUsers } from '../../services/userService';
-import { getRules } from '../../services/metaService';
 import Button from '../../components/common/Button';
 import Input from '../../components/common/Input';
 import { SeverityBadge } from '../../components/common/Badge';
+import { RULE_CATEGORIES, getRulesForCategory } from '../../data/categoryComplianceRules';
 
 function Toggle({ enabled, onChange }) {
   return (
@@ -22,12 +22,20 @@ function Toggle({ enabled, onChange }) {
 export default function Settings() {
   const [tab, setTab] = useState('general');
   const [users, setUsers] = useState([]);
-  const [complianceRules, setComplianceRules] = useState([]);
+  const [ruleCategory, setRuleCategory] = useState('Food & Beverage');
+  const [ruleSearch, setRuleSearch] = useState('');
 
   useEffect(() => {
     getUsers().then(setUsers).catch(() => setUsers([]));
-    getRules().then(setComplianceRules).catch(() => setComplianceRules([]));
   }, []);
+
+  // Rules for the selected product category, filtered by the (preserved) search text.
+  const categoryRules = getRulesForCategory(ruleCategory);
+  const visibleRules = ruleSearch.trim()
+    ? categoryRules.filter(r =>
+        r.name.toLowerCase().includes(ruleSearch.toLowerCase()) ||
+        r.description?.toLowerCase().includes(ruleSearch.toLowerCase()))
+    : categoryRules;
 
   const [notifications, setNotifications] = useState({
     email: true, slack: false, sla: true, newProduct: true, approved: true, rejected: true, certificate: true
@@ -139,22 +147,57 @@ export default function Settings() {
                   <h2 className="text-base font-600 text-gray-900">Compliance Rules</h2>
                   <Button size="sm" icon={FiPlus}>Add Rule</Button>
                 </div>
-                <div className="space-y-2">
-                  {complianceRules.map((rule) => (
-                    <div key={rule.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-500 text-gray-900">{rule.name}</span>
-                          <SeverityBadge severity={rule.severity} />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-0.5">{rule.category}</p>
-                      </div>
-                      <Toggle enabled={true} onChange={() => {}} />
-                      <button className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
-                        <FiEdit2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+
+                {/* Product-category segmented control */}
+                <div className="inline-flex items-center gap-1 p-1 bg-gray-100 rounded-xl">
+                  {RULE_CATEGORIES.map(cat => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setRuleCategory(cat)}
+                      className={`px-4 py-2 rounded-lg text-sm font-500 transition-all ${
+                        ruleCategory === cat ? 'bg-teal-700 text-white shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      {cat}
+                    </button>
                   ))}
+                </div>
+
+                {/* Search (preserved across category switches) */}
+                <Input
+                  placeholder="Search rules..."
+                  value={ruleSearch}
+                  onChange={e => setRuleSearch(e.target.value)}
+                />
+
+                <div className="space-y-2">
+                  {visibleRules.length === 0 ? (
+                    <div className="text-center py-12 border border-dashed border-gray-200 rounded-xl bg-gray-50">
+                      <p className="text-sm text-gray-500 font-500">No compliance rules found</p>
+                      <p className="text-xs text-gray-400 mt-1">
+                        {ruleSearch.trim()
+                          ? `No ${ruleCategory} rules match "${ruleSearch}".`
+                          : `No compliance rules are configured for ${ruleCategory}.`}
+                      </p>
+                    </div>
+                  ) : (
+                    visibleRules.map((rule) => (
+                      <div key={rule.id} className="flex items-center gap-3 p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-sm font-500 text-gray-900">{rule.name}</span>
+                            <SeverityBadge severity={rule.severity} />
+                          </div>
+                          <p className="text-xs text-gray-500 mt-0.5">{rule.category}</p>
+                        </div>
+                        <Toggle enabled={true} onChange={() => {}} />
+                        <button className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
+                          <FiEdit2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}
