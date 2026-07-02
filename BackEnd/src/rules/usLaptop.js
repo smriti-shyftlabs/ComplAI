@@ -108,6 +108,17 @@ export const US_LAPTOP_RULES = [
     trigger: (p) => { const d = new Date(docs(p).certificate_expiry); return !Number.isNaN(d.getTime()) && d.getTime() < Date.now(); } },
 ];
 
+/** The 10 mandatory Electronics fields that define a compliant listing. */
+export function allKeyFieldsPresent(product) {
+  const f = facts(product);
+  const d = docs(product);
+  return (
+    text(f.model_number) && text(f.processor) && text(f.ram) && text(f.storage) &&
+    text(f.display_size) && text(f.country_of_origin) && text(f.manufacturer_name) &&
+    num(f.adapter_power_w) && text(f.warranty) && text(d.fcc_id)
+  );
+}
+
 /** Run the engine against a product and return report-shaped fields. */
 export function evaluateUsLaptop(product) {
   // Context: duplicate-SKU lookup against the catalog.
@@ -136,13 +147,23 @@ export function evaluateUsLaptop(product) {
   }
 
   const hasCritical = violations.some(v => v.severity === 'critical');
-  const status = hasCritical || riskScore >= 50 ? 'RED' : riskScore >= 20 ? 'YELLOW' : 'GREEN';
+  let status = hasCritical || riskScore >= 50 ? 'RED' : riskScore >= 20 ? 'YELLOW' : 'GREEN';
 
   // Map to the app's 0–100 compliance score (higher = better). RED is capped
   // below the 75 approval threshold so Approve is disabled on a blocked launch.
-  const score = status === 'RED'
+  let score = status === 'RED'
     ? Math.max(0, Math.min(49, 100 - riskScore))
     : Math.max(0, 100 - riskScore);
+
+  // Business override (Rule Book v1.1): once every KEY catalog + compliance
+  // field is provided, the listing is considered compliant (>75) even if a
+  // couple of secondary rules still fire. Violations remain listed for
+  // transparency, but the score/status no longer block approval.
+  if (allKeyFieldsPresent(product)) {
+    score = Math.max(score, 80);
+    if (status === 'RED') status = 'YELLOW';
+  }
+
   const riskLevel = status === 'RED' ? 'high' : status === 'YELLOW' ? 'medium' : 'low';
 
   const recommendation = status === 'RED'
