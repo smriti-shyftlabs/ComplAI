@@ -48,20 +48,20 @@ export const CATEGORY_SCHEMAS = {
       {
         id: 'facts', title: 'Product Facts',
         fields: [
-          { key: 'model_number', label: 'Model Number', type: 'text', required: false, group: 'facts' },
-          { key: 'processor', label: 'Processor', type: 'text', required: false, group: 'facts', placeholder: 'e.g. Intel Core i7-1360P' },
-          { key: 'ram', label: 'RAM', type: 'text', required: false, group: 'facts', placeholder: 'e.g. 16GB' },
-          { key: 'storage', label: 'Storage', type: 'text', required: false, group: 'facts', placeholder: 'e.g. 512GB SSD' },
-          { key: 'display_size', label: 'Display Size', type: 'text', required: false, group: 'facts', placeholder: 'e.g. 15.6"' },
+          { key: 'model_number', label: 'Model Number', type: 'text', required: true, group: 'facts' },
+          { key: 'processor', label: 'Processor', type: 'text', required: true, group: 'facts', placeholder: 'e.g. Intel Core i7-1360P' },
+          { key: 'ram', label: 'RAM', type: 'text', required: true, group: 'facts', placeholder: 'e.g. 16GB' },
+          { key: 'storage', label: 'Storage', type: 'text', required: true, group: 'facts', placeholder: 'e.g. 512GB SSD' },
+          { key: 'display_size', label: 'Display Size', type: 'text', required: true, group: 'facts', placeholder: 'e.g. 15.6"' },
+          { key: 'country_of_origin', label: 'Country of Origin', type: 'text', required: true, group: 'facts', placeholder: 'e.g. China' },
+          { key: 'manufacturer_name', label: 'Manufacturer Details', type: 'text', required: true, group: 'facts', placeholder: 'e.g. Acme Inc, Shenzhen' },
+          { key: 'adapter_power_w', label: 'Adapter Wattage', type: 'number', required: true, group: 'facts', placeholder: 'e.g. 65' },
+          { key: 'warranty', label: 'Warranty', type: 'text', required: true, group: 'facts', placeholder: 'e.g. 1 year limited' },
+          // ── optional (recommended → raise readiness) ──
           { key: 'battery_type', label: 'Battery Type', type: 'select', options: ['Lithium-ion', 'Lithium-polymer', 'NiMH', 'Alkaline', 'None'], required: false, group: 'facts' },
           { key: 'battery_capacity_wh', label: 'Battery Capacity (Wh)', type: 'number', required: false, group: 'facts' },
-          { key: 'adapter_power_w', label: 'Adapter Power (W)', type: 'number', required: false, group: 'facts' },
           { key: 'adapter_input_voltage', label: 'Adapter Input Voltage', type: 'text', required: false, group: 'facts', placeholder: 'e.g. 100-240V' },
           { key: 'adapter_output_voltage', label: 'Adapter Output Voltage', type: 'text', required: false, group: 'facts', placeholder: 'e.g. 20V' },
-          { key: 'country_of_origin', label: 'Country of Origin', type: 'text', required: false, group: 'facts', placeholder: 'e.g. China' },
-          { key: 'manufacturer_name', label: 'Manufacturer Name', type: 'text', required: false, group: 'facts' },
-          { key: 'warranty', label: 'Warranty', type: 'text', required: false, group: 'facts', placeholder: 'e.g. 1 year limited' },
-          // ── optional (recommended → raise readiness) ──
           { key: 'wireless_features', label: 'Wireless Features', type: 'multiselect', options: ['Wi-Fi', 'Bluetooth', 'NFC', '5G', 'GPS', 'Zigbee'], required: false, group: 'facts' },
           { key: 'importer_name_us', label: 'Importer Name (US)', type: 'text', required: false, group: 'facts' },
           { key: 'importer_name_ca', label: 'Importer Name (Canada)', type: 'text', required: false, group: 'facts' },
@@ -70,7 +70,7 @@ export const CATEGORY_SCHEMAS = {
       {
         id: 'documents', title: 'Compliance Documents',
         fields: [
-          { key: 'fcc_id', label: 'FCC ID', type: 'text', required: false, group: 'documents' },
+          { key: 'fcc_id', label: 'FCC ID', type: 'text', required: true, group: 'documents' },
           { key: 'fcc_sdoc', label: 'FCC SDoC', type: 'toggle', required: false, group: 'documents' },
           { key: 'fcc_test_report', label: 'FCC Test Report', type: 'toggle', required: false, group: 'documents' },
           { key: 'ised_certification_number', label: 'ISED Certification Number', type: 'text', required: false, group: 'documents' },
