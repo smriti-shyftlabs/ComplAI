@@ -207,6 +207,10 @@ export default function ComplianceReport() {
             <ComplianceScore score={report?.score || 0} size="lg" />
             <div className="w-full mt-6 space-y-2 text-sm">
               {[
+                ...(report?.status ? [
+                  { label: 'Status', value: report.status, color: report.status === 'RED' ? 'text-red-600' : report.status === 'YELLOW' ? 'text-yellow-600' : 'text-teal-700' },
+                  { label: 'Risk Score', value: report.riskScore },
+                ] : []),
                 { label: 'Rules Checked', value: report?.rulesChecked || 20 },
                 { label: 'Rules Passed', value: report?.rulesPassed, color: 'text-teal-700' },
                 { label: 'Rules Failed', value: report?.rulesFailed, color: 'text-red-600' },
@@ -284,11 +288,15 @@ export default function ComplianceReport() {
                   fullWidth
                   icon={FiCheck}
                   loading={submitting === 'approve'}
-                  disabled={!!submitting}
+                  disabled={!!submitting || (report?.score ?? 0) < 75}
+                  title={(report?.score ?? 0) < 75 ? 'Compliance score must be at least 75 to approve' : undefined}
                   onClick={() => handleDecision('approve')}
                 >
                   Approve Product
                 </Button>
+                {(report?.score ?? 0) < 75 && (
+                  <p className="text-xs text-gray-400 text-center -mt-1">Score below 75 — resolve violations before approving.</p>
+                )}
                 <Button
                   variant="danger"
                   fullWidth

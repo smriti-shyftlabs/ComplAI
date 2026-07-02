@@ -4,7 +4,7 @@ import { SeverityBadge } from '../common/Badge';
 
 export default function RuleViolationCard({ violation, index = 0 }) {
   if (!violation) return null;
-  const { rule, severity, description, fix, suggestion } = violation;
+  const { rule, severity, description, fix, suggestion, ruleId, owner } = violation;
 
   const borderColor = severity === 'critical' ? 'border-red-300' : severity === 'high' ? 'border-orange-300' : severity === 'medium' ? 'border-yellow-300' : 'border-teal-200';
   const headerBg = severity === 'critical' ? 'bg-red-50' : severity === 'high' ? 'bg-orange-50' : severity === 'medium' ? 'bg-yellow-50' : 'bg-teal-50';
@@ -20,6 +20,7 @@ export default function RuleViolationCard({ violation, index = 0 }) {
         <FiAlertTriangle className={`w-4 h-4 flex-shrink-0 ${severity === 'critical' ? 'text-red-600' : severity === 'high' ? 'text-orange-600' : 'text-yellow-600'}`} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
+            {ruleId && <span className="text-xs font-700 text-gray-500 font-mono">{ruleId}</span>}
             <span className="text-sm font-600 text-gray-900">{rule}</span>
             <SeverityBadge severity={severity} />
           </div>
@@ -38,6 +39,9 @@ export default function RuleViolationCard({ violation, index = 0 }) {
             </div>
             <p className="text-sm text-gray-700">{fix}</p>
           </div>
+        )}
+        {owner && (
+          <p className="text-xs text-gray-400">Owner: <span className="font-500 text-gray-600">{owner}</span></p>
         )}
         {suggestion && (
           <div className="bg-teal-50 rounded-lg p-3">

@@ -9,6 +9,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Products, Reports, Rules, Approvals } from './seed.js';
 import { generateId } from './utils.js';
+import { evaluateUsLaptop, isUsLaptop } from './rules/usLaptop.js';
 
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-4-8';
 const client = process.env.ANTHROPIC_API_KEY ? new Anthropic() : null;
@@ -187,11 +188,16 @@ export async function analyzeProduct(product, { force = false } = {}) {
   if (cached && force) Reports().deleteWhere(r => r.productId === product.id);
 
   let result;
-  try {
-    result = client ? await claudeReport(product) : mockReport(product);
-  } catch (err) {
-    console.warn('[ai] Claude analysis failed, using fallback:', err.message);
-    result = mockReport(product);
+  if (isUsLaptop(product)) {
+    // US Electronics/Laptop → deterministic rule engine makes the decision.
+    result = evaluateUsLaptop(product);
+  } else {
+    try {
+      result = client ? await claudeReport(product) : mockReport(product);
+    } catch (err) {
+      console.warn('[ai] Claude analysis failed, using fallback:', err.message);
+      result = mockReport(product);
+    }
   }
 
   const report = {
@@ -201,15 +207,18 @@ export async function analyzeProduct(product, { force = false } = {}) {
     category: product.category,
     score: result.score,
     riskLevel: result.riskLevel,
+    status: result.status,          // GREEN | YELLOW | RED (rule engine only)
+    riskScore: result.riskScore,    // additive severity score (rule engine only)
     violations: result.violations || [],
     suggestions: result.suggestions || [],
     confidence: result.confidence,
     recommendation: result.recommendation,
+    nextActions: result.nextActions || [],
     analyzedAt: new Date().toISOString(),
-    rulesChecked: 20,
-    rulesPassed: 20 - (result.violations?.length || 0),
-    rulesFailed: result.violations?.length || 0,
-    engine: client ? 'claude' : 'mock',
+    rulesChecked: result.rulesChecked ?? 20,
+    rulesPassed: result.rulesPassed ?? (20 - (result.violations?.length || 0)),
+    rulesFailed: result.rulesFailed ?? (result.violations?.length || 0),
+    engine: result.engine || (client ? 'claude' : 'mock'),
   };
 
   Reports().insert(report);

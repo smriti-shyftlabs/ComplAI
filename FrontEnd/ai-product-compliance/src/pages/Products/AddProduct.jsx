@@ -74,7 +74,9 @@ export default function AddProduct() {
 
   const hasAnalysis = !!result;
   const outdated = hasAnalysis && analyzedSignature !== null && signature !== analyzedSignature;
-  const canPublish = hasAnalysis && !outdated && readiness.score >= PUBLISH_THRESHOLD;
+  // Publishing needs field readiness AND a passing compliance score (not RED, >= threshold).
+  const compliancePass = (result?.score ?? 0) >= PUBLISH_THRESHOLD && result?.status !== 'RED';
+  const canPublish = hasAnalysis && !outdated && readiness.score >= PUBLISH_THRESHOLD && compliancePass;
 
   // Persist the draft on every change (clear it once published).
   useEffect(() => {
@@ -270,7 +272,9 @@ export default function AddProduct() {
                   </Button>
                   {!canPublish && (
                     <p className="text-xs text-yellow-600 text-center">
-                      Readiness must reach {PUBLISH_THRESHOLD}% to publish — add more recommended details.
+                      {!compliancePass
+                        ? `Compliance score below ${PUBLISH_THRESHOLD} — resolve the violations before publishing.`
+                        : `Readiness must reach ${PUBLISH_THRESHOLD}% to publish — add more recommended details.`}
                     </p>
                   )}
                   <Button variant="ghost" fullWidth icon={FiRefreshCw} onClick={handleAnalyze}>Re-run Analysis</Button>
