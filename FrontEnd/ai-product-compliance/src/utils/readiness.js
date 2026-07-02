@@ -13,8 +13,10 @@
 
 import { COMMON_FIELDS, getCategoryFields } from '../data/categorySchemas';
 
-const MANDATORY_WEIGHT = 60;
-const OPTIONAL_WEIGHT = 40;
+// Completing every mandatory field lands at 80% (publishable); the remaining
+// 20% comes from recommended/optional fields.
+const MANDATORY_WEIGHT = 80;
+const OPTIONAL_WEIGHT = 20;
 export const PUBLISH_THRESHOLD = 75;
 
 /** Is a single field considered "provided", given its type + value? */
